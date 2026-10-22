@@ -1,0 +1,34 @@
+#!/bin/bash
+# fs-probe: report what the current process can list, read, and write.
+# Usage: fs-probe [path ...]   (defaults to the lab's interesting paths)
+# Landlock denials surface as EACCES ("Permission denied"), the same errno
+# as Unix permissions, so the fixtures are chosen so Unix perms would allow.
+
+paths=("$@")
+if [ ${#paths[@]} -eq 0 ]; then
+  # Known files are probed directly: a directory that cannot be listed
+  # still hides whether its files can be opened.
+  paths=(/sandbox /tmp /etc/os-release /usr /lab/public /lab/public/readme.txt
+         /lab/scratch /lab/secret/creds.txt /opt/agent-home/notes.txt
+         /home/sandbox /var/tmp)
+fi
+
+printf '%-26s %-6s %-6s %-6s\n' PATH LIST READ WRITE
+for p in "${paths[@]}"; do
+  list=DENY; read=DENY; write=DENY
+  [ -e "$p" ] || { printf '%-26s %s\n' "$p" "(missing)"; continue; }
+
+  ls "$p" >/dev/null 2>&1 && list=ok
+  if [ -d "$p" ]; then
+    # -readable uses access(2), which checks Unix perms but not Landlock, so
+    # the picked file is one that only Landlock could stop us from opening.
+    f=$(find "$p" -maxdepth 1 -type f -readable 2>/dev/null | head -1)
+    if [ -n "$f" ]; then head -c1 "$f" >/dev/null 2>&1 && read=ok; else read=-; fi
+    t="$p/.fs-probe.$$"
+    if (echo probe > "$t") 2>/dev/null; then write=ok; rm -f "$t"; fi
+  else
+    head -c1 "$p" >/dev/null 2>&1 && read=ok
+    [ -w "$p" ] && (: >> "$p") 2>/dev/null && write=ok
+  fi
+  printf '%-26s %-6s %-6s %-6s\n' "$p" "$list" "$read" "$write"
+done

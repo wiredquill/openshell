@@ -1,0 +1,25 @@
+# Provider profile for the lab's vLLM server (qwen3.8-27b, no API key).
+# A profile carries the network grant for a model API, so sandboxes get
+# inference by attaching a provider instead of editing their own policy:
+#   openshell profile import -f providers/qwen-local.yaml
+#   openshell provider create --name qwen --type qwen-local
+#   openshell sandbox create ... --provider qwen
+id: qwen-local
+display_name: Qwen (lab vLLM)
+description: OpenAI-compatible vLLM server at 10.9.0.42:30400 serving qwen3.8-27b
+category: inference
+inference_capable: true
+credentials: []
+endpoints:
+  - host: 10.9.0.42
+    port: 30400
+    allowed_ips: [10.9.0.42/32]
+    protocol: rest
+    enforcement: enforce
+    rules:
+      - allow: { method: GET,  path: /v1/models }
+      - allow: { method: POST, path: /v1/chat/completions }
+      - allow: { method: POST, path: /v1/completions }
+binaries:
+  - /usr/bin/curl
+  - /usr/bin/python3.13

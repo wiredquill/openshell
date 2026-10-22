@@ -1,0 +1,27 @@
+# Lab 01: filesystem access (Landlock).
+# Static section: read at sandbox start, cannot change on a live sandbox.
+# No network_policies here, so OpenShell adds no baseline paths: what you see
+# below is exactly what the workload can touch.
+version: 1
+
+filesystem_policy:
+  # Adds the workspace (/sandbox) to read_write.
+  include_workdir: true
+  read_only:
+    - /usr          # binaries and libraries (bash, coreutils, python)
+    - /lib
+    - /lib64
+    - /bin
+    - /etc          # passwd, nsswitch, os-release
+    - /proc
+    - /dev/urandom
+    - /lab/public   # data the agent may read but never modify
+  read_write:
+    - /tmp
+    - /dev/null
+    - /lab/scratch  # a second writable area besides the workspace
+  # Not listed, therefore invisible: /lab/secret, /opt, /home, /var/tmp
+
+landlock:
+  # Fail sandbox start instead of silently running without file rules.
+  compatibility: hard_requirement

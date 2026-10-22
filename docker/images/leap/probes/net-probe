@@ -1,0 +1,33 @@
+#!/bin/bash
+# net-probe: try a set of egress paths and report what the sandbox allowed.
+# Usage: net-probe [url ...]
+# Through OpenShell every TCP connect and DNS lookup is mediated by the
+# supervisor; a denial shows up as a 403 from the proxy or a failed connect.
+
+urls=("$@")
+if [ ${#urls[@]} -eq 0 ]; then
+  urls=(
+    https://api.github.com/zen
+    https://download.opensuse.org/
+    http://10.9.0.42:30400/v1/models
+    http://169.254.169.254/latest/meta-data/
+  )
+fi
+
+printf '%-45s %s\n' URL RESULT
+for u in "${urls[@]}"; do
+  out=$(curl -sS -m 8 -o /dev/null -w '%{http_code}' "$u" 2>&1)
+  rc=$?
+  if [ $rc -eq 0 ]; then
+    res="HTTP $out"
+  else
+    res="curl rc=$rc: $(echo "$out" | sed -n 's/^curl: ([0-9]*) //p' | head -1)"
+  fi
+  printf '%-45s %s\n' "$u" "$res"
+done
+
+echo
+# Policy DNS answers unapproved names with synthetic 198.18.0.0/15 addresses.
+echo "DNS download.opensuse.org -> $(getent hosts download.opensuse.org | awk '{print $1}' | head -1)"
+echo "Raw TCP (nc 1.1.1.1:53): $(nc -z -w 3 1.1.1.1 53 >/dev/null 2>&1 && echo open || echo blocked)"
+echo "Interfaces: $(ip -o link show 2>/dev/null | awk -F': ' '{print $2}' | tr '\n' ' ')"

@@ -1,0 +1,35 @@
+#!/bin/bash
+# proc-probe: show the process identity and try common escalation primitives.
+# Every "try" line should report BLOCKED inside an OpenShell sandbox.
+
+try() {
+  local label=$1; shift
+  if out=$("$@" 2>&1); then
+    printf '  %-32s ALLOWED\n' "$label"
+  else
+    printf '  %-32s BLOCKED  (%s)\n' "$label" "$(echo "$out" | tail -1 | cut -c1-60)"
+  fi
+}
+
+echo "== identity"
+echo "  id:            $(id)"
+grep -E '^(CapInh|CapPrm|CapEff|CapBnd|CapAmb|NoNewPrivs|Seccomp|Seccomp_filters):' /proc/self/status | sed 's/^/  /'
+echo "  decoded CapEff: $(capsh --decode=$(awk '/^CapEff/{print $2}' /proc/self/status) 2>/dev/null | cut -d= -f2)"
+echo "  decoded CapBnd: $(capsh --decode=$(awk '/^CapBnd/{print $2}' /proc/self/status) 2>/dev/null | cut -d= -f2 | cut -c1-70)"
+
+echo "== process tree visible to the workload"
+ps -eo pid,ppid,user,comm --forest | sed 's/^/  /'
+
+echo "== escalation attempts"
+try "sudo id"                     sudo -n id
+try "su root"                     su -c id root </dev/null
+try "unshare user namespace"      unshare -Ur id
+try "unshare mount namespace"     unshare -m true
+try "mount tmpfs"                 mount -t tmpfs none /tmp
+try "chroot /"                    chroot / true
+try "ptrace (strace a child)"     strace -f -o /dev/null true
+try "raw socket (ICMP ping)"      python3 -c 'import socket; socket.socket(socket.AF_INET, socket.SOCK_RAW, socket.IPPROTO_ICMP)'
+try "kill PID 1"                  kill -0 1
+try "write /etc/passwd"           sh -c 'echo x >> /etc/passwd'
+try "load kernel module info"     cat /proc/modules
+try "read /proc/1/environ"        cat /proc/1/environ

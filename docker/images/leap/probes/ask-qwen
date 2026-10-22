@@ -1,0 +1,40 @@
+#!/usr/bin/python3
+"""ask-qwen: send one chat prompt to the OpenAI-compatible endpoint.
+
+Usage: ask-qwen "your prompt"
+Reads OPENAI_BASE_URL (default http://10.9.0.42:30400/v1) and OPENAI_MODEL
+(default qwen3.8-27b). Uses only the standard library so it runs in any lab
+image; the connecting binary is /usr/bin/python3.13.
+"""
+import json
+import os
+import sys
+import urllib.error
+import urllib.request
+
+base = os.environ.get("OPENAI_BASE_URL", "http://10.9.0.42:30400/v1").rstrip("/")
+model = os.environ.get("OPENAI_MODEL", "qwen3.8-27b")
+prompt = " ".join(sys.argv[1:]) or "Say hello from inside an OpenShell sandbox in one sentence."
+
+req = urllib.request.Request(
+    f"{base}/chat/completions",
+    data=json.dumps({
+        "model": model,
+        "messages": [{"role": "user", "content": prompt}],
+        "max_tokens": 512,
+    }).encode(),
+    headers={
+        "Content-Type": "application/json",
+        "Authorization": f"Bearer {os.environ.get('OPENAI_API_KEY', 'unused')}",
+    },
+)
+try:
+    with urllib.request.urlopen(req, timeout=120) as resp:
+        body = json.load(resp)
+except urllib.error.HTTPError as e:
+    # OpenShell L7 denials come back as 403 with a JSON explanation.
+    sys.exit(f"HTTP {e.code}: {e.read().decode()[:400]}")
+except urllib.error.URLError as e:
+    sys.exit(f"connection failed: {e.reason}")
+
+print(body["choices"][0]["message"]["content"].strip())
