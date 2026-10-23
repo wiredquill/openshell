@@ -1,0 +1,5 @@
+#!/bin/sh
+# OpenShell starts processes with its own environment (HOME=/sandbox) and
+# does not pass the image ENV, so point Hermes at its install explicitly.
+export HERMES_HOME="${HERMES_HOME:-/opt/hermes}"
+exec /opt/hermes/hermes-agent/.hermes/bin/hermes "$@"

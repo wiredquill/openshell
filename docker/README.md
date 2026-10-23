@@ -34,6 +34,7 @@ procps, iproute2, strace, nc, capsh. It also holds deliberate traps:
 |---|---|
 | `USER sandbox` (1000) | Docker uses the image USER when policy doesn't set one. Root images are rejected. |
 | no `wget` | Lab 02 adds it with [images/leap-wget](images/leap-wget/Dockerfile). |
+| no agent | Lab 06 adds Hermes Agent with [images/hermes](images/hermes/Dockerfile). |
 | `/lab/public`, `/lab/scratch`, `/lab/secret` | Lab 03 grants them one at a time. |
 | `/lab/secret/creds.txt` owned by `sandbox`, mode 0600 | Unix permissions would allow it, so a denial can only come from Landlock. |
 | `/lab/team/report.txt` owned by uid 2000, mode 0600 | Landlock allows it, Unix permissions don't. Lab 04 switches the agent to uid 2000. |

@@ -1,0 +1,17 @@
+# Lab 06: Hermes Agent. This is the STARTING policy: no network rules (the
+# model comes from the qwen provider) and no /lab access.
+#
+# /opt/hermes is read-write because Hermes keeps its state there (config,
+# sessions, memories) next to its own Python. Landlock can't make a subtree
+# of a writable directory read-only, so the agent could modify its own
+# runtime; OpenShell's binary hashing denies network access to a changed
+# executable.
+version: 1
+
+filesystem_policy:
+  include_workdir: true
+  read_only: [/usr, /lib, /lib64, /bin, /etc, /proc, /dev/urandom]
+  read_write: [/tmp, /dev/null, /opt/hermes]
+
+landlock:
+  compatibility: hard_requirement

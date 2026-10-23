@@ -184,3 +184,5 @@ any other host fails with `credential_endpoint_mismatch`.
 ```bash
 openshell sandbox delete lab-qwen
 ```
+
+Next: [Lab 06: Hermes Agent](06-hermes.md).

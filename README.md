@@ -44,6 +44,7 @@ docker/                 Docker-driver lab (gateway on 10.0.9.102)
   gateway/gateway.toml  gateway config installed to ~/.config/openshell/gateway.toml
   images/leap/          openSUSE Leap 16 workload image + probe scripts
   images/leap-wget/     the lab image plus wget (Lab 02)
+  images/hermes/        the lab image plus Hermes Agent, configured for qwen (Lab 06)
   policies/             the starting policy for each lab; the labs edit them
   providers/            provider profile for the qwen vLLM server
   labs/                 the exercises, in order
@@ -62,5 +63,5 @@ Every lab follows the same loop: **try it** (it fails), **enable it** (change th
 4. [Lab 03: Files](docker/labs/03-files.md): read and write new directories (needs a restart)
 5. [Lab 04: Processes](docker/labs/04-process.md): run as another user (needs a new sandbox), and why root never works
 6. [Lab 05: Inference with qwen](docker/labs/05-inference-qwen.md): attach a provider, then update its profile
-7. Hermes agent in a sandbox (after the access labs)
+7. [Lab 06: Hermes Agent](docker/labs/06-hermes.md): run a real agent on qwen, and govern its tools
 8. Same labs on Kubernetes
