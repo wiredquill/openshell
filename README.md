@@ -43,7 +43,8 @@ docker/                 Docker-driver lab (gateway on 10.0.9.102)
   teardown.sh           delete lab sandboxes (--restore-podman to undo the driver switch)
   gateway/gateway.toml  gateway config installed to ~/.config/openshell/gateway.toml
   images/leap/          openSUSE Leap 16 workload image + probe scripts
-  policies/             one policy per lab
+  images/leap-wget/     the lab image plus wget (Lab 02)
+  policies/             the starting policy for each lab; the labs edit them
   providers/            provider profile for the qwen vLLM server
   labs/                 the exercises, in order
 k8s/                    Kubernetes lab (next)
@@ -52,10 +53,14 @@ podman/                 reserved
 
 ## Order
 
+Every lab follows the same loop: **try it** (it fails), **enable it** (change the policy),
+**try it again** (it works).
+
 1. [docker/README.md](docker/README.md): set up, and see how the Docker driver builds the boundary
-2. [Lab 01: Files](docker/labs/01-files.md)
-3. [Lab 02: Network](docker/labs/02-network.md)
-4. [Lab 03: Processes](docker/labs/03-process.md)
-5. [Lab 04: Inference with qwen](docker/labs/04-inference-qwen.md)
-6. Hermes agent in a sandbox (after the access labs)
-7. Same labs on Kubernetes
+2. [Lab 01: Network](docker/labs/01-network.md): allow suse.com from the CLI, then opensuse.org from the policy file
+3. [Lab 02: Add wget](docker/labs/02-wget.md): install a tool, then let it through the policy
+4. [Lab 03: Files](docker/labs/03-files.md): read and write new directories (needs a restart)
+5. [Lab 04: Processes](docker/labs/04-process.md): run as another user (needs a new sandbox), and why root never works
+6. [Lab 05: Inference with qwen](docker/labs/05-inference-qwen.md): attach a provider, then update its profile
+7. Hermes agent in a sandbox (after the access labs)
+8. Same labs on Kubernetes

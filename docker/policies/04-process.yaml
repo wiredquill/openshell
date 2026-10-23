@@ -1,0 +1,16 @@
+# Lab 04: process identity. This is the STARTING policy: no process section,
+# so the agent runs as the image USER (sandbox, uid 1000).
+#
+# /lab/team is listed read-only, so Landlock allows it; what blocks uid 1000
+# is ordinary Unix permissions (the files belong to uid 2000, mode 0600).
+# The process section is fixed at creation: `policy set` rejects changes,
+# so the sandbox must be recreated.
+version: 1
+
+filesystem_policy:
+  include_workdir: true
+  read_only: [/usr, /lib, /lib64, /bin, /etc, /proc, /dev/urandom, /lab/team]
+  read_write: [/tmp, /dev/null]
+
+landlock:
+  compatibility: hard_requirement

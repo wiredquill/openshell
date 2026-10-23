@@ -33,12 +33,15 @@ procps, iproute2, strace, nc, capsh. It also holds deliberate traps:
 | Fixture | Why it's there |
 |---|---|
 | `USER sandbox` (1000) | Docker uses the image USER when policy doesn't set one. Root images are rejected. |
-| `/lab/public`, `/lab/scratch`, `/lab/secret` | Lab 01 grants them one at a time. |
+| no `wget` | Lab 02 adds it with [images/leap-wget](images/leap-wget/Dockerfile). |
+| `/lab/public`, `/lab/scratch`, `/lab/secret` | Lab 03 grants them one at a time. |
 | `/lab/secret/creds.txt` owned by `sandbox`, mode 0600 | Unix permissions would allow it, so a denial can only come from Landlock. |
-| `/opt/agent-home/notes.txt` owned by `sandbox` | Same idea, and outside every baseline path. |
-| `sandbox ALL=(ALL) NOPASSWD: ALL` in sudoers | A misconfigured image. Lab 03 shows it still can't escalate. |
+| `/lab/team/report.txt` owned by uid 2000, mode 0600 | Landlock allows it, Unix permissions don't. Lab 04 switches the agent to uid 2000. |
+| `/opt/agent-home/notes.txt` owned by `sandbox` | Outside every policy and baseline path. |
+| `sandbox ALL=(ALL) NOPASSWD: ALL` in sudoers | A misconfigured image. Lab 04 shows it still can't escalate. |
 
-The probe scripts are installed into `/usr/local/bin`:
+The probe scripts are installed into `/usr/local/bin`. The labs don't need them, but they
+show a whole sandbox's boundary at once:
 
 | Probe | Shows |
 |---|---|

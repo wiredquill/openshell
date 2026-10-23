@@ -1,0 +1,28 @@
+# Lab 03: filesystem access. This is the STARTING policy: /lab/public is
+# readable, /lab/secret and /lab/scratch are not listed, so they are denied.
+#
+# filesystem_policy and landlock are static: additions are stored by
+# `policy set` but only enforced after `sandbox stop` + `sandbox start`;
+# removals are rejected on a live sandbox.
+version: 1
+
+filesystem_policy:
+  # The sandbox workspace (/sandbox) is read-write.
+  include_workdir: true
+  read_only:
+    - /usr
+    - /lib
+    - /lib64
+    - /bin
+    - /etc
+    - /proc
+    - /dev/urandom
+    - /lab/public
+  read_write:
+    - /tmp
+    - /dev/null
+
+# hard_requirement: refuse to start if Landlock can't be applied, instead of
+# silently running without file rules (best_effort).
+landlock:
+  compatibility: hard_requirement

@@ -1,0 +1,27 @@
+# Labs 01 and 02: network access. This is the STARTING policy: curl may reach
+# the openSUSE mirror and nothing else. The labs grow it one rule at a time.
+#
+# network_policies is a live section: edit this file, then
+#   openshell policy set <sandbox> --policy policies/01-network.yaml --wait
+# Each rule = (binaries) x (endpoints).
+version: 1
+
+filesystem_policy:
+  include_workdir: true
+  read_only: [/usr, /lib, /lib64, /bin, /etc, /proc, /dev/urandom]
+  read_write: [/tmp, /dev/null]
+
+landlock:
+  compatibility: hard_requirement
+
+network_policies:
+  # L7 inspected, read-only: GET/HEAD/OPTIONS pass, POST is answered 403.
+  opensuse_mirror:
+    endpoints:
+      - host: download.opensuse.org
+        port: 443
+        protocol: rest
+        enforcement: enforce
+        access: read-only
+    binaries:
+      - path: /usr/bin/curl

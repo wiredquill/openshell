@@ -33,6 +33,12 @@ RUN install -d -m 0755 /lab/public /lab/scratch /lab/secret \
 RUN install -d -o sandbox -g sandbox /opt/agent-home \
  && echo "owned by sandbox, but /opt is not in policy" > /opt/agent-home/notes.txt \
  && chown sandbox:sandbox /opt/agent-home/notes.txt
+# Fixture for the process lab: owned by uid 2000, mode 0600. Landlock can
+# allow /lab/team, but only an agent running as uid 2000 can read it.
+RUN install -d -m 0700 -o 2000 -g 2000 /lab/team \
+ && echo "Q3 report: only uid 2000 can read this" > /lab/team/report.txt \
+ && chown 2000:2000 /lab/team/report.txt \
+ && chmod 0600 /lab/team/report.txt
 
 COPY --chmod=0755 probes/ /usr/local/bin/
 
