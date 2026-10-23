@@ -1,0 +1,19 @@
+# Lab values for the official NVIDIA OpenShell chart
+# (oci://ghcr.io/nvidia/openshell/helm-chart, 0.1.5) on the ai-4090 RKE2
+# cluster. Interim: switch to the SUSE chart and images when they ship.
+
+server:
+  auth:
+    # UNSAFE outside a lab: the CLI reaches the gateway through a
+    # kubectl port-forward and is accepted without OIDC. Any pod in the
+    # cluster that can reach the ClusterIP Service can call the API too.
+    allowUnauthenticatedUsers: true
+  # No anonymous telemetry from the gateway or the sandbox supervisors.
+  telemetryEnabled: false
+
+# Default workload image when `sandbox create` has no --from: the openSUSE
+# Leap 16 lab image (same as docker/images/leap), published to GHCR.
+sandbox:
+  image:
+    repository: ghcr.io/wiredquill/openshell-lab/leap
+    tag: "16.0"
