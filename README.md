@@ -23,6 +23,18 @@ scripts/
   publish-charts.sh     package charts/* onto the aif/charts branch
   vendor-openshell-chart.sh   re-vendor NVIDIA's chart with nvidia-chart.patch
 ```
+## Add Repo to Rancher by importing ClusterRepo info 
+
+```
+apiVersion: catalog.cattle.io/v1
+kind: ClusterRepo
+metadata:
+  name: wiredquill-openshell
+spec:
+  gitRepo: https://github.com/wiredquill/openshell
+  gitBranch: aif/charts
+```
+
 
 ## Install order
 
