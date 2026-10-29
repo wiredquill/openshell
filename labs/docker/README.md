@@ -7,7 +7,7 @@ The OpenShell RPM installs a **user** systemd unit (`openshell-gateway.service`)
 to Docker:
 
 ```bash
-cd /data/openshell-lab/docker
+cd /data/openshell-lab/labs/docker
 ./setup.sh
 ```
 

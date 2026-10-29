@@ -1,0 +1,33 @@
+name: Publish Helm Charts
+
+# Packages charts/* onto the aif/charts branch, the git ClusterRepo
+# (catalog/clusterrepos/wiredquill-openshell.yaml) that Rancher Apps and SUSE AI
+# Factory read. Chart versions are immutable: bump a chart's version to ship it.
+on:
+  push:
+    branches: [main]
+    paths: ['charts/**']
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Install Helm
+        uses: azure/setup-helm@v4
+
+      - name: Configure Git
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Publish
+        run: scripts/publish-charts.sh --push

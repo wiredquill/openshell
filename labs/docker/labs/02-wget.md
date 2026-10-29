@@ -12,7 +12,7 @@ the repo. Curl may reach `download.opensuse.org`.
 ## 0. Create the sandbox
 
 ```bash
-cd /data/openshell-lab/docker
+cd /data/openshell-lab/labs/docker
 openshell sandbox create --name lab-wget --from localhost/openshell-lab/leap:16.0 \
   --policy policies/01-network.yaml --no-auto-providers --detach -- sleep infinity
 X="openshell sandbox exec -n lab-wget --no-tty --"

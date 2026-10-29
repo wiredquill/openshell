@@ -1,0 +1,12 @@
+# Chart repository for chartRepo: wiredquill-openshell: agent-sandbox,
+# openshell-gateway, hermes-openshell and hermes-rancher, published from
+# github.com/wiredquill/openshell (scripts/publish-charts.sh, run by the
+# publish-charts workflow). Register once per Rancher management cluster
+# (Apps and SUSE AI Factory both read it).
+apiVersion: catalog.cattle.io/v1
+kind: ClusterRepo
+metadata:
+  name: wiredquill-openshell
+spec:
+  gitRepo: https://github.com/wiredquill/openshell
+  gitBranch: aif/charts
