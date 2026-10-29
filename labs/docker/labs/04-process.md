@@ -11,7 +11,7 @@ Starting policy: [../policies/04-process.yaml](../policies/04-process.yaml). It 
 ## 0. Create the sandbox
 
 ```bash
-cd /data/openshell-lab/docker
+cd /data/openshell-lab/labs/docker
 openshell sandbox create --name lab-proc --from localhost/openshell-lab/leap:16.0 \
   --policy policies/04-process.yaml --no-auto-providers --detach -- sleep infinity
 X="openshell sandbox exec -n lab-proc --no-tty --"

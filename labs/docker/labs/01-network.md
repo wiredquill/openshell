@@ -15,7 +15,7 @@ Starting policy: [../policies/01-network.yaml](../policies/01-network.yaml). Cur
 ## 0. Create the sandbox
 
 ```bash
-cd /data/openshell-lab/docker
+cd /data/openshell-lab/labs/docker
 openshell sandbox create --name lab-net --from localhost/openshell-lab/leap:16.0 \
   --policy policies/01-network.yaml --no-auto-providers --detach -- sleep infinity
 X="openshell sandbox exec -n lab-net --no-tty --"     # shorthand: run a command in lab-net

@@ -34,7 +34,7 @@ openshell provider list
 Use the Lab 03 file policy, which has no network rules at all:
 
 ```bash
-cd /data/openshell-lab/docker
+cd /data/openshell-lab/labs/docker
 openshell sandbox create --name lab-qwen --from localhost/openshell-lab/leap:16.0 \
   --policy policies/03-files.yaml --no-auto-providers \
   --env OPENAI_BASE_URL=http://10.9.0.42:30400/v1 --env OPENAI_MODEL=qwen3.8-27b \

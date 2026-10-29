@@ -14,7 +14,7 @@ rules and no `/lab` access.
 ## 0. Build the Hermes image
 
 ```bash
-cd /data/openshell-lab/docker
+cd /data/openshell-lab/labs/docker
 docker build -t localhost/openshell-lab/hermes:16.0 images/hermes     # about 4 minutes, 4.7 GB
 ```
 

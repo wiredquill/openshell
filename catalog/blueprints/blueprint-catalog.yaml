@@ -1,0 +1,22 @@
+apiVersion: ai-factory.suse.com/v1alpha1
+kind: BlueprintCatalog
+metadata:
+  # Catalog identity (DNS-1123, <=40 chars). The operator derives a Fleet
+  # GitRepo name and a catalog label from this. Keep it the SAME as the
+  # `blueprintCatalogs[].name` you register in Settings / the aif-operator
+  # helm values.
+  name: openshell
+spec:
+  displayName: WiredQuill OpenShell
+  description: Agents in NVIDIA OpenShell sandboxes — Hermes Agent, Hermes for Rancher, and can-i.
+  categories: [demo, llm, security]
+  maintainer:
+    name: WiredQuill
+    url: https://github.com/wiredquill
+  blueprints:
+    # `name` MUST match each Blueprint CR's ai-factory.suse.com/blueprint-name
+    # LABEL (the family), not the resource name.
+    - name: can-i-openshell
+    - name: hermes-openshell
+    - name: hermes-openshell-vllm
+    - name: hermes-rancher
