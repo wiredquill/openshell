@@ -53,7 +53,7 @@ spec:
               enabled: false
     - chartName: hermes-openshell
       chartRepo: wiredquill-openshell
-      chartVersion: "0.2.0"
+      chartVersion: "0.2.1"
       releaseName: hermes
       values:
         profile: research

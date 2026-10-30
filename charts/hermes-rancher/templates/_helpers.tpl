@@ -194,26 +194,32 @@ app.kubernetes.io/instance: {{ .Release.Name }}
      which runs the model. One suse_ai_declared_component data point per
      component, one suse_ai_declared_relation per relation; timeUnixNano is
      set when it is sent (__NOW__). No service.name, so the OpenTelemetry
-     StackPack does not turn the sender into a service. */}}
+     StackPack does not turn the sender into a service. Each component also
+     carries the service.instance.id it reports (the agent: the sandbox name;
+     the engine and model: their own names, as the SUSE AI collector sets), so
+     the StackPack gives it the per-namespace identifier and Hermes installed
+     in two namespaces stays two agents. */}}
 {{- define "hermes-rancher.topologyPayload" -}}
 {{- $engine := include "hermes-rancher.provider" . -}}
 {{- $vllm := eq .Values.model.backend "vllm" -}}
 {{- $model := ternary .Values.model.vllm.name .Values.model.external.name $vllm -}}
+{{- $agent := .Values.observability.serviceName -}}
+{{- $instance := .Values.sandbox.name -}}
 {{- $components := list
-  (list "application" .Values.observability.serviceName "application")
-  (list "inference-engine" $engine (ternary "inference-engine.vllm" "inference-engine" $vllm))
-  (list "llm-model" $model (ternary "llm-model.vllm" "llm-model" $vllm)) -}}
+  (list "application" $agent "application" $instance)
+  (list "inference-engine" $engine (ternary "inference-engine.vllm" "inference-engine" $vllm) $engine)
+  (list "llm-model" $model (ternary "llm-model.vllm" "llm-model" $vllm) $model) -}}
 {{- $relations := list
-  (list "application" .Values.observability.serviceName "inference-engine" $engine "uses")
-  (list "inference-engine" $engine "llm-model" $model "runs") -}}
+  (list "application" $agent "inference-engine" $engine "uses" $instance $engine)
+  (list "inference-engine" $engine "llm-model" $model "runs" $engine $model) -}}
 {{- $cpoints := list -}}
 {{- range $components -}}
-{{- $attrs := list (include "hermes-rancher.topologyAttr" (list "type" (index . 0)) | fromJson) (include "hermes-rancher.topologyAttr" (list "name" (index . 1)) | fromJson) (include "hermes-rancher.topologyAttr" (list "type_name" (index . 2)) | fromJson) -}}
+{{- $attrs := list (include "hermes-rancher.topologyAttr" (list "type" (index . 0)) | fromJson) (include "hermes-rancher.topologyAttr" (list "name" (index . 1)) | fromJson) (include "hermes-rancher.topologyAttr" (list "type_name" (index . 2)) | fromJson) (include "hermes-rancher.topologyAttr" (list "instance" (index . 3)) | fromJson) -}}
 {{- $cpoints = append $cpoints (dict "asInt" "1" "timeUnixNano" "__NOW__" "attributes" $attrs) -}}
 {{- end -}}
 {{- $rpoints := list -}}
 {{- range $relations -}}
-{{- $attrs := list (include "hermes-rancher.topologyAttr" (list "source.type" (index . 0)) | fromJson) (include "hermes-rancher.topologyAttr" (list "source.name" (index . 1)) | fromJson) (include "hermes-rancher.topologyAttr" (list "target.type" (index . 2)) | fromJson) (include "hermes-rancher.topologyAttr" (list "target.name" (index . 3)) | fromJson) (include "hermes-rancher.topologyAttr" (list "type" (index . 4)) | fromJson) -}}
+{{- $attrs := list (include "hermes-rancher.topologyAttr" (list "source.type" (index . 0)) | fromJson) (include "hermes-rancher.topologyAttr" (list "source.name" (index . 1)) | fromJson) (include "hermes-rancher.topologyAttr" (list "target.type" (index . 2)) | fromJson) (include "hermes-rancher.topologyAttr" (list "target.name" (index . 3)) | fromJson) (include "hermes-rancher.topologyAttr" (list "type" (index . 4)) | fromJson) (include "hermes-rancher.topologyAttr" (list "source.instance" (index . 5)) | fromJson) (include "hermes-rancher.topologyAttr" (list "target.instance" (index . 6)) | fromJson) -}}
 {{- $rpoints = append $rpoints (dict "asInt" "1" "timeUnixNano" "__NOW__" "attributes" $attrs) -}}
 {{- end -}}
 {{- $resource := list (include "hermes-rancher.topologyAttr" (list "suse.ai.topology.declared" "true") | fromJson) (include "hermes-rancher.topologyAttr" (list "k8s.namespace.name" .Release.Namespace) | fromJson) -}}

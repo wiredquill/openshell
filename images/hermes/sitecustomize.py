@@ -12,6 +12,8 @@
 #   HERMES_OTEL_ENVIRONMENT      deployment.environment (default default)
 #   HERMES_OTEL_CAPTURE_CONTENT  true = prompts and replies in the spans
 #   HERMES_OTEL_LOG              where exporter errors go (default /tmp/hermes-otel.log)
+#   OTEL_RESOURCE_ATTRIBUTES     its gen_ai.provider.name (e.g. vllm) also goes
+#                                on every GenAI span and metric data point
 #
 # Exporter and instrumentation logs go to that file, never stderr: stderr is
 # the terminal Hermes draws its UI in, and a missing collector would scribble
@@ -36,6 +38,20 @@ if os.environ.get("OTEL_EXPORTER_OTLP_ENDPOINT"):
         import openlit
 
         service = os.environ.get("OTEL_SERVICE_NAME", "hermes-agent")
+
+        # OpenLit's openai instrumentation stamps gen_ai.provider.name=openai
+        # on every span and metric data point, and the SUSE AI collector
+        # (groupbyattrs) lifts that over the resource's value, so the engine
+        # showed up as "openai" instead of the vllm the chart declares. OpenLit
+        # applies custom attributes after its own, so pass the real provider.
+        resource = dict(
+            pair.split("=", 1)
+            for pair in os.environ.get("OTEL_RESOURCE_ATTRIBUTES", "").split(",")
+            if "=" in pair
+        )
+        provider = resource.get("gen_ai.provider.name", "").strip()
+        custom = {"gen_ai.provider.name": provider} if provider else None
+
         openlit.init(
             application_name=service,
             service_name=service,
@@ -44,6 +60,13 @@ if os.environ.get("OTEL_EXPORTER_OTLP_ENDPOINT"):
                 "HERMES_OTEL_CAPTURE_CONTENT", "true"
             ).lower()
             == "true",
+            # No plain HTTP client spans: each turn Hermes probes the model
+            # server for metadata (/api/tags, /props, /version, OpenRouter...),
+            # and every 404 or blocked host became an ERROR span, so the
+            # service read ~80% errors. The model calls keep their GenAI spans.
+            disabled_instrumentors=["httpx", "requests", "urllib", "urllib3"],
+            custom_span_attributes=custom,
+            custom_metrics_attributes=custom,
         )
 
         # vLLM answers non-streaming calls (cron jobs, summaries) with
