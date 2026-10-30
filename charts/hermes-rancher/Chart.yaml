@@ -2,7 +2,7 @@ apiVersion: v2
 name: hermes-rancher
 description: 'Hermes for Rancher: Hermes Agent (Nous Research) for platform engineers, in an NVIDIA OpenShell sandbox on a SUSE OS, with kubectl on the cluster under a ServiceAccount of its own (view or operator). Install next to the OpenShell gateway app; also the hermes-rancher SUSE AI Factory blueprint.'
 type: application
-version: 0.2.1
+version: 0.2.2
 appVersion: 0.19.0
 keywords:
 - ai

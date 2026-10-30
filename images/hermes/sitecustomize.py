@@ -44,6 +44,11 @@ if os.environ.get("OTEL_EXPORTER_OTLP_ENDPOINT"):
                 "HERMES_OTEL_CAPTURE_CONTENT", "true"
             ).lower()
             == "true",
+            # No plain HTTP client spans: each turn Hermes probes the model
+            # server for metadata (/api/tags, /props, /version, OpenRouter...),
+            # and every 404 or blocked host became an ERROR span, so the
+            # service read ~80% errors. The model calls keep their GenAI spans.
+            disabled_instrumentors=["httpx", "requests", "urllib", "urllib3"],
         )
 
         # vLLM answers non-streaming calls (cron jobs, summaries) with
