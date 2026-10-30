@@ -45,6 +45,9 @@ model:
   external:
     url: https://openrouter.ai/api/v1
     name: nousresearch/hermes-4-70b
+    # The SUSE AI inference engine to show for this API (gen_ai.provider.name
+    # and the declared topology's engine), e.g. vllm for a vLLM server.
+    provider: openai
     # The key is handed to the OpenShell gateway, which injects it only into
     # requests to this URL's host; the sandbox sees a placeholder. Set one:
     apiKey: ""
@@ -119,6 +122,15 @@ observability:
   # Put prompts, replies and tool definitions in the spans. Off = only sizes,
   # tokens and timings.
   captureContent: true
+  # Declare the agent -> inference engine -> model topology to SUSE
+  # Observability up front, instead of waiting for the first model call. Needs
+  # SUSE Observability 2.12+ with the SUSE AI Declared Topology StackPack
+  # (wiredquill/ai-demos stackpacks/suse-ai-declared-topology).
+  topology:
+    enabled: true
+    # The StackPack expires elements 15 minutes after their last refresh.
+    refreshSchedule: "*/5 * * * *"
+    image: registry.suse.com/bci/bci-base:15.7
 
 gateway:
   # The openshell-gateway chart's Service and client certificate Secret.

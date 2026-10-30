@@ -215,6 +215,27 @@ kubectl -n <ns> exec deploy/<release>-client -- \
 OpenLit 1.44.0 fails on vLLM's non-streaming replies (`prompt_tokens_details:
 null`) and drops their token counts; `sitecustomize.py` patches that.
 
+### Declared topology
+
+With `observability.topology.enabled` (the default), the chart also declares
+Hermes's SUSE AI topology up front, so SUSE Observability shows it before the
+first model call:
+
+```
+hermes-agent ──uses──> <inference engine> ──runs──> <model>
+```
+
+The engine is `vllm` (type `inference-engine.vllm`) for the `vllm` backend, and
+`model.external.provider` (default `openai`) for an external API; set it to
+`vllm` for a vLLM server. The same name goes on the agent's telemetry as
+`gen_ai.provider.name`, so the engine the SUSE AI collector infers is the one
+declared. A post-install Job and a CronJob (`observability.topology.refreshSchedule`,
+every 5 minutes) send it to the collector as OTLP metrics; the SUSE AI Declared
+Topology StackPack turns them into components and relations, which expire 15
+minutes after the last refresh. It needs SUSE Observability 2.12 or later with
+that StackPack installed (`stackpacks/suse-ai-declared-topology` in
+wiredquill/ai-demos); without it the metrics are stored and nothing else happens.
+
 ## Tools in the sandbox
 
 The sandbox can't install anything (no root, and no profile reaches a package

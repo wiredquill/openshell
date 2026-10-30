@@ -97,7 +97,7 @@ spec:
             - name: OTEL_SERVICE_NAME
               value: {{ .serviceName | quote }}
             - name: OTEL_RESOURCE_ATTRIBUTES
-              value: {{ printf "k8s.namespace.name=%s,service.namespace=%s,service.instance.id=%s" $.Release.Namespace $.Release.Namespace $.Values.sandbox.name | quote }}
+              value: {{ printf "k8s.namespace.name=%s,service.namespace=%s,service.instance.id=%s,gen_ai.provider.name=%s" $.Release.Namespace $.Release.Namespace $.Values.sandbox.name (include "hermes-openshell.provider" $) | quote }}
             - name: HERMES_OTEL_ENVIRONMENT
               value: {{ .environment | quote }}
             - name: HERMES_OTEL_CAPTURE_CONTENT
