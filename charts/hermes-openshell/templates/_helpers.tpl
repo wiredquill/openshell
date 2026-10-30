@@ -136,3 +136,93 @@ app.kubernetes.io/instance: {{ .Release.Name }}
 {{- end -}}
 {{- printf "%s · %s" $name .Values.profile -}}
 {{- end -}}
+
+{{/* The SUSE AI inference engine Hermes calls: vllm for the vllm backend, else
+     model.external.provider. Also its gen_ai.provider.name, so the engine the
+     SUSE AI collector infers is the one declared. */}}
+{{- define "hermes-openshell.provider" -}}
+{{- if eq .Values.model.backend "vllm" }}vllm{{ else }}{{ .Values.model.external.provider | default "openai" }}{{ end -}}
+{{- end -}}
+
+{{- define "hermes-openshell.topologyAttr" -}}
+{{- dict "key" (index . 0) "value" (dict "stringValue" (index . 1)) | toJson -}}
+{{- end -}}
+
+{{/* Declared SUSE AI topology, as an OTLP/JSON metrics request for the SUSE AI
+     Declared Topology StackPack (wiredquill/ai-demos
+     stackpacks/suse-ai-declared-topology): the agent uses the inference engine,
+     which runs the model. One suse_ai_declared_component data point per
+     component, one suse_ai_declared_relation per relation; timeUnixNano is
+     set when it is sent (__NOW__). No service.name, so the OpenTelemetry
+     StackPack does not turn the sender into a service. */}}
+{{- define "hermes-openshell.topologyPayload" -}}
+{{- $engine := include "hermes-openshell.provider" . -}}
+{{- $vllm := eq .Values.model.backend "vllm" -}}
+{{- $model := ternary .Values.model.vllm.name .Values.model.external.name $vllm -}}
+{{- $components := list
+  (list "application" .Values.observability.serviceName "application")
+  (list "inference-engine" $engine (ternary "inference-engine.vllm" "inference-engine" $vllm))
+  (list "llm-model" $model (ternary "llm-model.vllm" "llm-model" $vllm)) -}}
+{{- $relations := list
+  (list "application" .Values.observability.serviceName "inference-engine" $engine "uses")
+  (list "inference-engine" $engine "llm-model" $model "runs") -}}
+{{- $cpoints := list -}}
+{{- range $components -}}
+{{- $attrs := list (include "hermes-openshell.topologyAttr" (list "type" (index . 0)) | fromJson) (include "hermes-openshell.topologyAttr" (list "name" (index . 1)) | fromJson) (include "hermes-openshell.topologyAttr" (list "type_name" (index . 2)) | fromJson) -}}
+{{- $cpoints = append $cpoints (dict "asInt" "1" "timeUnixNano" "__NOW__" "attributes" $attrs) -}}
+{{- end -}}
+{{- $rpoints := list -}}
+{{- range $relations -}}
+{{- $attrs := list (include "hermes-openshell.topologyAttr" (list "source.type" (index . 0)) | fromJson) (include "hermes-openshell.topologyAttr" (list "source.name" (index . 1)) | fromJson) (include "hermes-openshell.topologyAttr" (list "target.type" (index . 2)) | fromJson) (include "hermes-openshell.topologyAttr" (list "target.name" (index . 3)) | fromJson) (include "hermes-openshell.topologyAttr" (list "type" (index . 4)) | fromJson) -}}
+{{- $rpoints = append $rpoints (dict "asInt" "1" "timeUnixNano" "__NOW__" "attributes" $attrs) -}}
+{{- end -}}
+{{- $resource := list (include "hermes-openshell.topologyAttr" (list "suse.ai.topology.declared" "true") | fromJson) (include "hermes-openshell.topologyAttr" (list "k8s.namespace.name" .Release.Namespace) | fromJson) -}}
+{{- with dig "cattle" "clusterName" "" (.Values.global | default dict) -}}
+{{- $resource = append $resource (include "hermes-openshell.topologyAttr" (list "k8s.cluster.name" .) | fromJson) -}}
+{{- end -}}
+{{- toJson (dict "resourceMetrics" (list (dict
+  "resource" (dict "attributes" $resource)
+  "scopeMetrics" (list (dict
+    "scope" (dict "name" "suse-ai-declared-topology" "version" .Chart.Version)
+    "metrics" (list
+      (dict "name" "suse_ai_declared_component" "gauge" (dict "dataPoints" $cpoints))
+      (dict "name" "suse_ai_declared_relation" "gauge" (dict "dataPoints" $rpoints)))))))) -}}
+{{- end -}}
+
+{{/* Pod spec shared by the topology Job and CronJob. */}}
+{{- define "hermes-openshell.topologyPodSpec" -}}
+restartPolicy: OnFailure
+automountServiceAccountToken: false
+securityContext:
+  runAsNonRoot: true
+  runAsUser: 65534
+  seccompProfile:
+    type: RuntimeDefault
+containers:
+  - name: push
+    image: {{ .Values.observability.topology.image | quote }}
+    command: ["/bin/sh", "/topology/push.sh"]
+    env:
+      - name: OTLP_ENDPOINT
+        value: {{ include "hermes-openshell.otlpEndpoint" . | trimSuffix "/" | quote }}
+    volumeMounts:
+      - name: topology
+        mountPath: /topology
+        readOnly: true
+    securityContext:
+      allowPrivilegeEscalation: false
+      readOnlyRootFilesystem: true
+      capabilities:
+        drop: ["ALL"]
+    resources:
+      requests:
+        cpu: 10m
+        memory: 32Mi
+      limits:
+        cpu: 100m
+        memory: 64Mi
+volumes:
+  - name: topology
+    configMap:
+      name: {{ include "hermes-openshell.fullname" . }}-topology
+{{- end -}}

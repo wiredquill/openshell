@@ -60,6 +60,13 @@ questions:
   default: nousresearch/hermes-4-70b
   show_if: "model.backend=external"
   description: The model name the API expects, e.g. nousresearch/hermes-4-70b on OpenRouter.
+- variable: model.external.provider
+  label: Inference engine
+  group: Model
+  type: string
+  default: openai
+  show_if: "model.backend=external"
+  description: What serves this API, as SUSE Observability's SUSE AI view should show it, e.g. <code>vllm</code> for a vLLM server, <code>openai</code> for OpenRouter or OpenAI.
 - variable: model.external.apiKey
   label: API key
   group: Model
@@ -412,6 +419,14 @@ questions:
   default: true
   show_if: "observability.enabled=true"
   description: Off = spans keep token counts and timings but not the text.
+
+- variable: observability.topology.enabled
+  label: Declare the topology
+  group: Observability
+  type: boolean
+  default: true
+  show_if: "observability.enabled=true"
+  description: Show Hermes -> inference engine -> model in SUSE Observability's SUSE AI view before the first model call. Needs SUSE Observability 2.12+ with the SUSE AI Declared Topology StackPack.
 
 - variable: gateway.endpoint
   label: OpenShell gateway endpoint
