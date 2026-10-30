@@ -7,7 +7,7 @@ entries:
       catalog.cattle.io/release-name: agent-sandbox
     apiVersion: v2
     appVersion: v1.0.8
-    created: "2026-10-29T16:51:06.072420901Z"
+    created: "2026-10-30T01:02:35.033726917Z"
     description: Kubernetes Agent Sandbox CRD and controller (agents.x-k8s.io), the
       cluster prerequisite for OpenShell's Kubernetes driver. Install first, once
       per cluster. Packages the upstream v1.0.8 sandbox.yaml release manifest.
@@ -35,7 +35,37 @@ entries:
       catalog.cattle.io/release-name: hermes
     apiVersion: v2
     appVersion: 0.19.0
-    created: "2026-10-29T16:51:06.073315467Z"
+    created: "2026-10-30T01:02:35.037216497Z"
+    description: Hermes Agent (Nous Research) in an NVIDIA OpenShell sandbox on a
+      SUSE OS, with a choice of four security profiles and a browser terminal. Install
+      next to the OpenShell gateway app; also a component of the hermes-openshell
+      SUSE AI Factory blueprints.
+    digest: 41a07e3ae2139f1735fabca97d6c1aa74cd63851fb794f71ba3edc7fdc7838e0
+    home: https://github.com/wiredquill/openshell
+    keywords:
+    - ai
+    - agent
+    - hermes
+    - openshell
+    - sandbox
+    - suse-ai-factory
+    maintainers:
+    - name: WiredQuill
+      url: https://github.com/wiredquill
+    name: hermes-openshell
+    sources:
+    - https://github.com/NousResearch/hermes-agent
+    - https://github.com/NVIDIA/OpenShell
+    type: application
+    urls:
+    - https://github.com/wiredquill/openshell/hermes-openshell-0.2.0.tgz
+    version: 0.2.0
+  - annotations:
+      catalog.cattle.io/display-name: OpenShell 3 - Hermes Agent sandbox
+      catalog.cattle.io/release-name: hermes
+    apiVersion: v2
+    appVersion: 0.19.0
+    created: "2026-10-30T01:02:35.035513346Z"
     description: Hermes Agent (Nous Research) in an NVIDIA OpenShell sandbox on a
       SUSE OS, with a choice of four security profiles and a browser terminal. Install
       next to the OpenShell gateway app; also a component of the hermes-openshell
@@ -66,7 +96,40 @@ entries:
       catalog.cattle.io/release-name: hermes-rancher
     apiVersion: v2
     appVersion: 0.19.0
-    created: "2026-10-29T16:51:06.074408206Z"
+    created: "2026-10-30T01:02:35.041056275Z"
+    description: 'Hermes for Rancher: Hermes Agent (Nous Research) for platform engineers,
+      in an NVIDIA OpenShell sandbox on a SUSE OS, with kubectl on the cluster under
+      a ServiceAccount of its own (view or operator). Install next to the OpenShell
+      gateway app; also the hermes-rancher SUSE AI Factory blueprint.'
+    digest: cfdf931193f584bc5dd5193e532e6eaa2849d6d88350de8f9dde66c85310b511
+    home: https://github.com/wiredquill/openshell
+    keywords:
+    - ai
+    - agent
+    - hermes
+    - openshell
+    - sandbox
+    - rancher
+    - kubernetes
+    - platform-engineering
+    - suse-ai-factory
+    maintainers:
+    - name: WiredQuill
+      url: https://github.com/wiredquill
+    name: hermes-rancher
+    sources:
+    - https://github.com/NousResearch/hermes-agent
+    - https://github.com/NVIDIA/OpenShell
+    type: application
+    urls:
+    - https://github.com/wiredquill/openshell/hermes-rancher-0.2.0.tgz
+    version: 0.2.0
+  - annotations:
+      catalog.cattle.io/display-name: Hermes for Rancher
+      catalog.cattle.io/release-name: hermes-rancher
+    apiVersion: v2
+    appVersion: 0.19.0
+    created: "2026-10-30T01:02:35.039048972Z"
     description: 'Hermes for Rancher: Hermes Agent (Nous Research) for platform engineers,
       in an NVIDIA OpenShell sandbox on a SUSE OS, with kubectl on the cluster under
       a ServiceAccount of its own (view or operator). Install next to the OpenShell
@@ -100,7 +163,7 @@ entries:
       catalog.cattle.io/release-name: openshell
     apiVersion: v2
     appVersion: 0.1.5
-    created: "2026-10-29T16:51:06.077466587Z"
+    created: "2026-10-30T01:02:35.046538751Z"
     dependencies:
     - alias: openshell
       name: helm-chart
@@ -128,4 +191,4 @@ entries:
     urls:
     - https://github.com/wiredquill/openshell/openshell-gateway-0.1.8.tgz
     version: 0.1.8
-generated: "2026-10-29T16:51:06.071374802Z"
+generated: "2026-10-30T01:02:35.031324787Z"
