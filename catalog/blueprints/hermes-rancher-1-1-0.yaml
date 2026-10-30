@@ -59,7 +59,7 @@ spec:
               enabled: false
     - chartName: hermes-rancher
       chartRepo: wiredquill-openshell
-      chartVersion: "0.2.0"
+      chartVersion: "0.2.1"
       releaseName: hermes-rancher
       values:
         profile: research
