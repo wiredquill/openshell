@@ -6,6 +6,8 @@ SUSE: hands-on labs, Helm charts, sandbox images and SUSE AI Factory blueprints.
 ## Layout
 
 ```
+docs/
+  landlock/             enable Landlock on SLES and openSUSE nodes, required before installing
 labs/                   hands-on OpenShell labs (Docker driver, then Kubernetes) — start at labs/README.md
 charts/
   agent-sandbox/        Agent Sandbox CRD + controller, the prerequisite for the Kubernetes driver
@@ -37,6 +39,9 @@ spec:
 
 
 ## Install order
+
+Every node that runs sandboxes needs Landlock enabled in its kernel, or no sandbox starts.
+Do this first: [Enable Landlock on SLES and openSUSE](docs/landlock/README.md).
 
 In Rancher **Apps** the chart names start with **OpenShell** and give the order:
 
