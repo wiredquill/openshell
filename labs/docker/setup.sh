@@ -7,9 +7,19 @@ cd "$(dirname "$0")"
 IMAGE=localhost/openshell-lab/leap:16.0
 CONF=~/.config/openshell/gateway.toml
 
+echo "==> preflight"
+for bin in openshell openshell-gateway docker systemctl; do
+  command -v "$bin" >/dev/null || { echo "error: '$bin' not found. Install the OpenShell RPM and Docker first." >&2; exit 1; }
+done
+systemctl --user cat openshell-gateway.service >/dev/null 2>&1 \
+  || { echo "error: user unit openshell-gateway.service not found. Is the OpenShell RPM installed?" >&2; exit 1; }
+
 echo "==> gateway: pin Docker compute driver"
-# The RPM seeds a Podman-pinned config; keep the original once.
-[ -f "$CONF.podman.bak" ] || cp "$CONF" "$CONF.podman.bak"
+mkdir -p "$(dirname "$CONF")"
+# The RPM may seed a Podman-pinned config; keep the original once, if there is one.
+if [ -f "$CONF" ] && [ ! -f "$CONF.podman.bak" ]; then
+  cp "$CONF" "$CONF.podman.bak"
+fi
 if ! cmp -s gateway/gateway.toml "$CONF"; then
   cp gateway/gateway.toml "$CONF"
   openshell-gateway config preflight
