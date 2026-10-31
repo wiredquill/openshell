@@ -68,13 +68,15 @@ done
 if [ ${#need[@]} -gt 0 ]; then
   tmp=$(mktemp -d)
   trap 'rm -rf "$tmp"' EXIT
+  # Every RPM's checksum, the gateway's included, is in openshell-checksums-sha256.txt;
+  # openshell-gateway-checksums-sha256.txt lists only the tarballs.
+  curl -fsSL -o "$tmp/sums" "$RELEASE/openshell-checksums-sha256.txt"
   rpms=()
   for p in "${need[@]}"; do
     rpm_file=$p-$VERSION-1.fc44.$arch.rpm
     curl -fsSL -o "$tmp/$rpm_file" "$RELEASE/$rpm_file"
-    curl -fsSL -o "$tmp/$p.sha256" "$RELEASE/$p-checksums-sha256.txt"
-    sum=$(awk -v f="$rpm_file" '{n=$2; sub(/^\*/,"",n); sub(/.*\//,"",n)} n==f {print $1}' "$tmp/$p.sha256")
-    [ -n "$sum" ] || { echo "error: no checksum for $rpm_file in $p-checksums-sha256.txt" >&2; exit 1; }
+    sum=$(awk -v f="$rpm_file" '$2 == f {print $1}' "$tmp/sums")
+    [ -n "$sum" ] || { echo "error: no checksum for $rpm_file in openshell-checksums-sha256.txt" >&2; exit 1; }
     echo "$sum  $tmp/$rpm_file" | sha256sum -c --quiet
     rpms+=("$tmp/$rpm_file")
   done

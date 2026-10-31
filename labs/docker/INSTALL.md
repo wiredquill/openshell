@@ -88,15 +88,18 @@ docker version
 | `openshell-gateway` | the gateway (control plane) and its **user** systemd unit, `openshell-gateway.service` |
 
 The RPMs are built for Fedora (`fc44`) and aren't GPG-signed, so check them against the
-release's SHA-256 checksums before you install them:
+release's SHA-256 checksums before you install them. Every RPM's checksum is in
+`openshell-checksums-sha256.txt`; `openshell-gateway-checksums-sha256.txt` lists only the
+tarballs.
 
 ```bash
 V=0.1.5; ARCH=$(uname -m)            # x86_64 or aarch64
 R=https://github.com/NVIDIA/OpenShell/releases/download/v$V
 cd /tmp
+curl -fsSL -o openshell-checksums-sha256.txt $R/openshell-checksums-sha256.txt
 for p in openshell openshell-gateway; do
   curl -fLO $R/$p-$V-1.fc44.$ARCH.rpm
-  curl -fsSL $R/$p-checksums-sha256.txt | grep "$p-$V-1.fc44.$ARCH.rpm" | sha256sum -c
+  grep " $p-$V-1.fc44.$ARCH.rpm\$" openshell-checksums-sha256.txt | sha256sum -c   # ...: OK
 done
 zypper --non-interactive install --allow-unsigned-rpm \
   ./openshell-$V-1.fc44.$ARCH.rpm ./openshell-gateway-$V-1.fc44.$ARCH.rpm
