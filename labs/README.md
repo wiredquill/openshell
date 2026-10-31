@@ -39,6 +39,8 @@ the real connection only if allowed. Policy is one YAML file with four sections:
 
 ```
 docker/                 Docker-driver lab (gateway on 10.0.9.102)
+  INSTALL.md            build a host: Landlock, Docker, OpenShell, start the gateway
+  install.sh            the root steps of INSTALL.md
   setup.sh              pin the gateway to Docker, build image, register qwen provider
   teardown.sh           delete lab sandboxes (--restore-podman to undo the driver switch)
   gateway/gateway.toml  gateway config installed to ~/.config/openshell/gateway.toml
@@ -57,11 +59,12 @@ podman/                 reserved
 Every lab follows the same loop: **try it** (it fails), **enable it** (change the policy),
 **try it again** (it works).
 
-1. [docker/README.md](docker/README.md): set up, and see how the Docker driver builds the boundary
-2. [Lab 01: Network](docker/labs/01-network.md): allow suse.com from the CLI, then opensuse.org from the policy file
-3. [Lab 02: Add wget](docker/labs/02-wget.md): install a tool, then let it through the policy
-4. [Lab 03: Files](docker/labs/03-files.md): read and write new directories (needs a restart)
-5. [Lab 04: Processes](docker/labs/04-process.md): run as another user (needs a new sandbox), and why root never works
-6. [Lab 05: Inference with qwen](docker/labs/05-inference-qwen.md): attach a provider, then update its profile
-7. [Lab 06: Hermes Agent](docker/labs/06-hermes.md): run a real agent on qwen, and govern its tools
-8. Same labs on Kubernetes
+1. [docker/INSTALL.md](docker/INSTALL.md): build the host: Landlock, Docker, OpenShell, the gateway
+2. [docker/README.md](docker/README.md): set up, and see how the Docker driver builds the boundary
+3. [Lab 01: Network](docker/labs/01-network.md): allow suse.com from the CLI, then opensuse.org from the policy file
+4. [Lab 02: Add wget](docker/labs/02-wget.md): install a tool, then let it through the policy
+5. [Lab 03: Files](docker/labs/03-files.md): read and write new directories (needs a restart)
+6. [Lab 04: Processes](docker/labs/04-process.md): run as another user (needs a new sandbox), and why root never works
+7. [Lab 05: Inference with qwen](docker/labs/05-inference-qwen.md): attach a provider, then update its profile
+8. [Lab 06: Hermes Agent](docker/labs/06-hermes.md): run a real agent on qwen, and govern its tools
+9. Same labs on Kubernetes
