@@ -29,7 +29,7 @@ scripts/
 apiVersion: catalog.cattle.io/v1
 kind: ClusterRepo
 metadata:
-  name: wiredquill-openshell
+  name: openshell
 spec:
   gitRepo: https://github.com/wiredquill/openshell
   gitBranch: aif/charts
