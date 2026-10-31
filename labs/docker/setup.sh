@@ -25,9 +25,21 @@ if ! cmp -s gateway/gateway.toml "$CONF"; then
   openshell-gateway config preflight
   systemctl --user restart openshell-gateway
 fi
+systemctl --user is-active -q openshell-gateway || systemctl --user enable --now openshell-gateway
+
+echo "==> CLI: register the local gateway"
+# The RPM starts the gateway but doesn't register it with the CLI.
+# `--local` uses the local gateway's own client mTLS bundle and makes it active.
+if ! openshell gateway list 2>/dev/null | grep -qw local; then
+  openshell gateway add https://127.0.0.1:17670 --local --name local
+fi
+openshell gateway select local >/dev/null
+
 # The Docker driver takes a few seconds to connect after a restart.
-for _ in $(seq 30); do openshell status >/dev/null 2>&1 && break; sleep 1; done
+for _ in $(seq 30); do openshell status 2>/dev/null | grep -q 'Status: Connected' && break; sleep 1; done
 openshell status
+openshell status | grep -q 'Status: Connected' \
+  || { echo "error: gateway not connected; see: journalctl --user -u openshell-gateway -n 50" >&2; exit 1; }
 
 echo "==> image: build $IMAGE"
 docker build -q -t "$IMAGE" images/leap
