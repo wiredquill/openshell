@@ -1,5 +1,5 @@
 # OpenShell gateway config for the Docker lab (installed to ~/.config/openshell/gateway.toml).
-# The RPM seeds a Podman-pinned config; this pins the Docker driver instead.
+# Pins the Docker compute driver (OpenShell can also use Podman, Kubernetes or a VM).
 
 [openshell]
 version = 2

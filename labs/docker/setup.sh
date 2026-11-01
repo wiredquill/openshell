@@ -28,7 +28,7 @@ systemctl --user cat openshell-gateway.service >/dev/null 2>&1 \
 
 echo "==> gateway: pin Docker compute driver"
 mkdir -p "$(dirname "$CONF")"
-# The RPM may seed a Podman-pinned config; keep the original once, if there is one.
+# Keep any existing config (e.g. a Podman-pinned one) once, for teardown.sh --restore-podman.
 if [ -f "$CONF" ] && [ ! -f "$CONF.podman.bak" ]; then
   cp "$CONF" "$CONF.podman.bak"
 fi
@@ -37,7 +37,8 @@ if ! cmp -s gateway/gateway.toml "$CONF"; then
   openshell-gateway config preflight
   systemctl --user restart openshell-gateway
 fi
-systemctl --user is-active -q openshell-gateway || systemctl --user enable --now openshell-gateway
+# The RPM installs the unit disabled; enable it so it comes back after a reboot.
+systemctl --user enable --now openshell-gateway
 
 echo "==> CLI: register the local gateway"
 # The RPM starts the gateway but doesn't register it with the CLI.

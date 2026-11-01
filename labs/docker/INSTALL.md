@@ -140,13 +140,20 @@ cp gateway/gateway.toml ~/.config/openshell/gateway.toml
 openshell-gateway config preflight      # validates the config
 ```
 
-**Start it.** The gateway listens on `127.0.0.1:17670`, with mutual TLS:
+**Start it.** The RPM installs the unit *disabled*, so enable it as well, or it won't come
+back after a reboot. On each start, the unit checks the config (`config preflight`) and
+creates the gateway's TLS certificates in `~/.local/state/openshell/tls` the first time.
+The gateway then listens on `127.0.0.1:17670`, with mutual TLS:
 
 ```bash
 systemctl --user enable --now openshell-gateway
-systemctl --user status openshell-gateway
+systemctl --user status openshell-gateway              # active (running)
 journalctl --user -u openshell-gateway | grep driver   # Using compute driver driver=docker
 ```
+
+`activating (auto-restart)` in the status means the gateway keeps crashing. The reason is
+in `journalctl --user -u openshell-gateway -n 40 --no-pager -o cat`; see
+[Troubleshooting](#troubleshooting).
 
 **Point the CLI at it.** The CLI needs the gateway's address and a client certificate.
 `--local` takes the certificate from the local gateway and makes this gateway the active
@@ -171,5 +178,5 @@ Run `./setup.sh` (it skips the parts you've already done), then go on to the
 | `Status: No gateway configured` / `No active gateway` | Step 5, `openshell gateway add`. |
 | `Failed to connect to bus` | Logged in with `su` or `sudo`. SSH in as the lab user. |
 | `setup.sh`: not in the docker group in this login | Added to the group after this shell started. Log in again, or `newgrp docker`. |
-| `Connection refused` on 127.0.0.1:17670; gateway log shows `permission denied ... docker.sock` | The user's systemd manager started before you joined the docker group, and lingering keeps it alive across logouts. `sudo systemctl restart user@$(id -u)`, or reboot. |
+| `Connection refused` on 127.0.0.1:17670; the gateway log says `failed to query Docker daemon version: ... client error (Connect)` | The gateway can't open `/var/run/docker.sock`. Its systemd manager (`user@UID`) started before you joined the docker group, and lingering keeps it alive across logouts. Check: `grep Groups /proc/$(pgrep -u $USER -x systemd)/status` lacks the docker gid (`getent group docker`). Fix: `sudo systemctl restart user@$(id -u)`, or reboot. Also check that Docker is running: `systemctl status docker`. |
 | Sandbox fails to start, mentions Landlock | Step 1: `landlock` missing from `/sys/kernel/security/lsm`. |
