@@ -86,7 +86,13 @@ fi
 rpm -q openshell openshell-gateway
 
 echo "==> 4/4 lab user: $LAB_USER"
-usermod -aG docker "$LAB_USER"
+uid=$(id -u "$LAB_USER")
+if ! id -nG "$LAB_USER" | grep -qw docker; then
+  usermod -aG docker "$LAB_USER"
+  # The user's systemd manager (which runs the gateway) keeps the groups it started
+  # with, and lingering keeps it alive across logouts: restart it to pick up docker.
+  systemctl is-active -q "user@$uid" && systemctl restart "user@$uid"
+fi
 loginctl enable-linger "$LAB_USER"
 echo "  in group docker, user services linger"
 

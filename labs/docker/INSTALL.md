@@ -115,6 +115,7 @@ account:
 ```bash
 useradd -m <lab-user> && passwd <lab-user>   # skip if the account exists
 usermod -aG docker <lab-user>                # may use the Docker socket
+systemctl restart user@$(id -u <lab-user>)   # if the user is logged in: the gateway's manager picks up the group
 loginctl enable-linger <lab-user>            # user services keep running after logout
 ```
 
@@ -169,5 +170,6 @@ Run `./setup.sh` (it skips the parts you've already done), then go on to the
 | `cp: ... gateway.toml: No such file or directory` | An older `setup.sh`. Pull the latest. |
 | `Status: No gateway configured` / `No active gateway` | Step 5, `openshell gateway add`. |
 | `Failed to connect to bus` | Logged in with `su` or `sudo`. SSH in as the lab user. |
-| `permission denied ... docker.sock` | Not in the docker group in this login. Log out and back in. |
+| `setup.sh`: not in the docker group in this login | Added to the group after this shell started. Log in again, or `newgrp docker`. |
+| `Connection refused` on 127.0.0.1:17670; gateway log shows `permission denied ... docker.sock` | The user's systemd manager started before you joined the docker group, and lingering keeps it alive across logouts. `sudo systemctl restart user@$(id -u)`, or reboot. |
 | Sandbox fails to start, mentions Landlock | Step 1: `landlock` missing from `/sys/kernel/security/lsm`. |
