@@ -1,20 +1,33 @@
 # OpenShell with Docker
 
-## Setup
+## Install
 
-The OpenShell RPM installs a **user** systemd unit (`openshell-gateway.service`) and seeds
-`~/.config/openshell/gateway.toml` pinned to `compute_driver = "podman"`. This lab switches it
-to Docker:
+On a fresh host, start with **[INSTALL.md](INSTALL.md)**. It covers switching on Landlock,
+installing Docker and OpenShell, and starting the gateway, each step explained. The short
+version:
 
 ```bash
-cd /data/openshell-lab/labs/docker
+sudo ./install.sh <lab-user>   # Landlock, Docker, OpenShell RPMs, lab user (may ask for a reboot)
+# log out, SSH in as <lab-user>
 ./setup.sh
 ```
 
-`setup.sh`:
+## Setup
 
-1. backs up the seeded config to `~/.config/openshell/gateway.toml.podman.bak`, installs
-   [gateway/gateway.toml](gateway/gateway.toml), and restarts the gateway
+The OpenShell RPM installs a **user** systemd unit (`openshell-gateway.service`). This lab
+pins it to the Docker driver:
+
+```bash
+cd labs/docker
+./setup.sh
+```
+
+`setup.sh`, run as the lab user (not root):
+
+0. checks the host; if Landlock, Docker or OpenShell is missing, runs `sudo ./install.sh` and stops
+1. installs [gateway/gateway.toml](gateway/gateway.toml), backing up any existing config to
+   `~/.config/openshell/gateway.toml.podman.bak`, then (re)starts the gateway, registers it with
+   the CLI as `local`, and waits for `Status: Connected`
 2. builds `localhost/openshell-lab/leap:16.0` from [images/leap](images/leap/Dockerfile)
 3. imports the [qwen-local](providers/qwen-local.yaml) provider profile and creates the `qwen` provider
 

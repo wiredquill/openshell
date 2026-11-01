@@ -8,15 +8,27 @@ IMAGE=localhost/openshell-lab/leap:16.0
 CONF=~/.config/openshell/gateway.toml
 
 echo "==> preflight"
-for bin in openshell openshell-gateway docker systemctl; do
-  command -v "$bin" >/dev/null || { echo "error: '$bin' not found. Install the OpenShell RPM and Docker first." >&2; exit 1; }
-done
+[ "$(uname -s)" = Linux ] || { echo "error: the Docker labs need a Linux host (see INSTALL.md)." >&2; exit 1; }
+[ "$(id -u)" -ne 0 ] || { echo "error: run setup.sh as the lab user, not root (see INSTALL.md)." >&2; exit 1; }
+
+# A fresh host: Landlock, Docker and OpenShell are installed by install.sh, as root.
+missing=no
+for bin in openshell openshell-gateway docker; do command -v "$bin" >/dev/null || missing=yes; done
+grep -qw landlock /sys/kernel/security/lsm || missing=yes
+if [ "$missing" = yes ]; then
+  echo "Landlock, Docker or OpenShell is missing; running install.sh as root."
+  sudo ./install.sh "$USER"
+  echo "Then (after a reboot, if install.sh asked for one) log in again over SSH and re-run ./setup.sh."
+  exit 0
+fi
+id -nG | grep -qw docker \
+  || { echo "error: $USER isn't in the docker group in this login. Log out and SSH in again." >&2; exit 1; }
 systemctl --user cat openshell-gateway.service >/dev/null 2>&1 \
-  || { echo "error: user unit openshell-gateway.service not found. Is the OpenShell RPM installed?" >&2; exit 1; }
+  || { echo "error: no user unit openshell-gateway.service. Log in over SSH (not su/sudo) so the user systemd session runs." >&2; exit 1; }
 
 echo "==> gateway: pin Docker compute driver"
 mkdir -p "$(dirname "$CONF")"
-# The RPM may seed a Podman-pinned config; keep the original once, if there is one.
+# Keep any existing config (e.g. a Podman-pinned one) once, for teardown.sh --restore-podman.
 if [ -f "$CONF" ] && [ ! -f "$CONF.podman.bak" ]; then
   cp "$CONF" "$CONF.podman.bak"
 fi
@@ -25,7 +37,8 @@ if ! cmp -s gateway/gateway.toml "$CONF"; then
   openshell-gateway config preflight
   systemctl --user restart openshell-gateway
 fi
-systemctl --user is-active -q openshell-gateway || systemctl --user enable --now openshell-gateway
+# The RPM installs the unit disabled; enable it so it comes back after a reboot.
+systemctl --user enable --now openshell-gateway
 
 echo "==> CLI: register the local gateway"
 # The RPM starts the gateway but doesn't register it with the CLI.
@@ -61,4 +74,4 @@ openshell provider get qwen >/dev/null 2>&1 \
   || openshell provider create --name qwen --type qwen-local
 openshell provider list
 
-echo "==> ready. Start with labs/01-files.md"
+echo "==> ready. Start with labs/01-network.md"
