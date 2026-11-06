@@ -409,6 +409,31 @@ questions:
   max: 32767
   show_if: "service.type=NodePort"
   description: Blank = assigned by Kubernetes.
+- variable: ingress.enabled
+  label: HTTPS Ingress
+  group: Browser terminal
+  type: boolean
+  default: false
+  description: >-
+    Serve the terminal at https://<host> through the cluster's Ingress, with a real certificate.
+    Use this when the browser refuses the plain-HTTP NodePort.
+  show_subquestion_if: true
+  subquestions:
+  - variable: ingress.host
+    label: Hostname
+    type: string
+    required: true
+    default: ""
+    description: Unique per sandbox and covered by the certificate, e.g. hermes.dev-lab.dna-42.com.
+  - variable: ingress.tlsSecret
+    label: TLS certificate Secret
+    type: string
+    default: wildcard-tls
+    description: The cluster's wildcard certificate, already copied into every namespace. Blank = HTTP only.
+  - variable: ingress.className
+    label: Ingress class
+    type: string
+    default: traefik
 
 - variable: client.image.repository
   label: Client image

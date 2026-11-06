@@ -153,4 +153,18 @@ service:
   # Only for NodePort; blank = assigned by Kubernetes.
   nodePort: ""
 
+# HTTPS for the browser terminal. Browsers that upgrade http:// to https://
+# (Chrome's HTTPS-First) fail on the plain-HTTP NodePort; an Ingress with a
+# real certificate avoids that. The lab clusters have a Let's Encrypt
+# wildcard for *.<cluster>.dna-42.com in Secret wildcard-tls, copied into every
+# namespace, and wildcard DNS pointing at the cluster.
+ingress:
+  enabled: false
+  # Required when enabled, unique per sandbox, e.g. hermes.dev-lab.dna-42.com
+  host: ""
+  className: traefik
+  # Blank = no TLS block (plain HTTP on the Ingress).
+  tlsSecret: wildcard-tls
+  annotations: {}
+
 imagePullSecrets: []

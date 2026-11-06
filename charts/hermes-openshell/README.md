@@ -23,6 +23,23 @@ the profile binds the key to that host: the sandbox's `HERMES_LLM_API_KEY` holds
 a placeholder, and the gateway's proxy swaps in the real key only on requests to
 the model. OpenShell 0.1.5 has no `inference.local` route.
 
+### HTTPS (Ingress)
+
+The NodePort serves plain HTTP. Browsers that upgrade `http://` to `https://`
+(Chrome's HTTPS-First) then fail with a certificate or connection error. Turn on
+**Browser terminal > HTTPS Ingress** (`ingress.enabled=true`) and give a
+hostname covered by the cluster's certificate:
+
+```yaml
+ingress:
+  enabled: true
+  host: hermes.dev-lab.dna-42.com   # unique per sandbox
+  tlsSecret: wildcard-tls           # default: the lab wildcard cert in every namespace
+  className: traefik
+```
+
+The terminal's websocket (`/ws`) goes through the same Ingress.
+
 ## Profiles
 
 Each is a full OpenShell policy in `profiles/`; the form's `profile` picks one.
