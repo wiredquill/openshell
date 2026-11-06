@@ -1,0 +1,35 @@
+# One blueprint per Rancher app in the wiredquill-openshell repository, the same
+# chart and version, with the chart's own defaults: install them in the numbered
+# order, like the Rancher apps.
+apiVersion: ai-factory.suse.com/v1alpha1
+kind: Blueprint
+metadata:
+  labels:
+    ai-factory.suse.com/blueprint-name: hermes-openshell
+    ai-factory.suse.com/blueprint-version: 2.1.0
+  name: hermes-openshell-2-1-0
+spec:
+  source: Custom  # community, unsupported demo
+  displayName: OpenShell 3 - Hermes Agent sandbox
+  version: 2.1.0
+  description: |
+    Nous Research's Hermes Agent in an NVIDIA OpenShell sandbox on SUSE BCI 16 or
+    openSUSE Leap 16, under one of four security profiles (lockdown, research,
+    developer, dangerous), with a browser terminal. Pick the model backend in the
+    form: an OpenAI-compatible API such as OpenRouter (the gateway holds the key,
+    so it never enters the sandbox) or a vLLM service in the cluster.
+
+    Install into the namespace of OpenShell 2 - Gateway, or tick "Install the
+    OpenShell gateway in this namespace" (first page of the form) to install the
+    gateway together with Hermes. Agent Sandbox (OpenShell 1) is needed either way.
+
+    2.1.0 adds that gateway option and an optional HTTPS Ingress for the browser
+    terminal (Browser terminal > HTTPS Ingress) using the cluster's wildcard
+    certificate.
+    2.0.0 installs only this app, like the Rancher app. 1.x bundled Agent Sandbox
+    and the gateway.
+  components:
+  - chartName: hermes-openshell
+    chartRepo: wiredquill-openshell
+    chartVersion: 0.2.2
+    releaseName: hermes

@@ -23,6 +23,35 @@ the profile binds the key to that host: the sandbox's `HERMES_LLM_API_KEY` holds
 a placeholder, and the gateway's proxy swaps in the real key only on requests to
 the model. OpenShell 0.1.5 has no `inference.local` route.
 
+### Gateway in the same namespace
+
+Hermes needs an OpenShell gateway in its namespace. Either install
+**OpenShell 2 - Gateway** there first, or tick **Install the OpenShell gateway
+in this namespace** on the first page of the form (`openshellGateway.enabled=true`)
+to install it with Hermes from the vendored `openshell-gateway` chart. Its
+Service and client certificate keep the names `openshell` and
+`openshell-client-tls`, so the gateway settings need no change. Leave it off if
+the namespace already has a gateway. Agent Sandbox (OpenShell 1) must be in the
+cluster either way. Gateway settings go under `openshellGateway.*`, e.g.
+`openshellGateway.openshell.service.type`.
+
+### HTTPS (Ingress)
+
+The NodePort serves plain HTTP. Browsers that upgrade `http://` to `https://`
+(Chrome's HTTPS-First) then fail with a certificate or connection error. Turn on
+**Browser terminal > HTTPS Ingress** (`ingress.enabled=true`) and give a
+hostname covered by the cluster's certificate:
+
+```yaml
+ingress:
+  enabled: true
+  host: hermes.dev-lab.dna-42.com   # unique per sandbox
+  tlsSecret: wildcard-tls           # default: the lab wildcard cert in every namespace
+  className: traefik
+```
+
+The terminal's websocket (`/ws`) goes through the same Ingress.
+
 ## Profiles
 
 Each is a full OpenShell policy in `profiles/`; the form's `profile` picks one.
