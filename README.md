@@ -35,12 +35,11 @@ components can't install.
 | ClusterRepo name | Source | Used by |
 |---|---|---|
 | `wiredquill-openshell` | this repo, branch `aif/charts` | every blueprint |
-| `wiredquill-can-i` | `wiredquill/can-i`, branch `aif/charts` | `can-i-openshell` |
 | `wiredquill-ai-demos` | `wiredquill/ai-demos`, branch `aif/charts` | `hermes-openshell-vllm` (SUSE `vllm` with an install form) |
 
 In Rancher, open the **local** cluster, click **Import YAML** (the up-arrow icon in the
 top bar) and paste this. `catalog/clusterrepos/` holds only `wiredquill-openshell`, the one
-this repo owns; the other two are defined in can-i and ai-demos:
+this repo owns; the other is defined in ai-demos:
 
 ```yaml
 apiVersion: catalog.cattle.io/v1
@@ -49,14 +48,6 @@ metadata:
   name: wiredquill-openshell
 spec:
   gitRepo: https://github.com/wiredquill/openshell
-  gitBranch: aif/charts
----
-apiVersion: catalog.cattle.io/v1
-kind: ClusterRepo
-metadata:
-  name: wiredquill-can-i
-spec:
-  gitRepo: https://github.com/wiredquill/can-i
   gitBranch: aif/charts
 ---
 apiVersion: catalog.cattle.io/v1
@@ -84,7 +75,7 @@ In Rancher **Apps** the chart names start with **OpenShell** and give the order:
 | 2 | **OpenShell 2 - Gateway** | `openshell-gateway` | one per namespace; creates no sandbox |
 | 3 | **OpenShell 3 - Hermes Agent sandbox** | `hermes-openshell` | in the gateway's namespace |
 | 3 | **Hermes for Rancher** | `hermes-rancher` | in the gateway's namespace |
-| 3 | **OpenShell 3 - can-i sandbox** | `can-i` ([wiredquill/can-i](https://github.com/wiredquill/can-i)) | in the gateway's namespace |
+| 3 | **OpenShell 3 - can-i sandbox** | `can-i` (from [SUSE-Technical-Marketing/can-i](https://github.com/SUSE-Technical-Marketing/can-i), its own chart repo) | in the gateway's namespace |
 
 Only step 3 creates a sandbox and a web UI. The architecture diagram is in
 [`charts/agent-sandbox/README.md`](charts/agent-sandbox/README.md#architecture).
@@ -98,14 +89,14 @@ Only step 3 creates a sandbox and a web UI. The architecture diagram is in
 | `hermes-openshell` 1.0.0 | `agent-sandbox`, `openshell-gateway`, `hermes-openshell`. The model is an external OpenAI-compatible API (OpenRouter by default). |
 | `hermes-openshell-vllm` 1.0.0 | Same, plus SUSE `vllm` 0.1.10 serving Qwen2.5-7B-Instruct (GPU) |
 | `hermes-rancher` 1.0.0 | `agent-sandbox`, `openshell-gateway`, `hermes-rancher` |
-| `can-i-openshell` 1.0.0 | `agent-sandbox`, `openshell-gateway`, and `can-i` |
 
-The blueprints need the three ClusterRepos in
+The blueprints need the two ClusterRepos in
 [Add the chart repositories to Rancher](#add-the-chart-repositories-to-rancher).
 
-The `can-i-openshell` blueprint also exists in the can-i repository. Register only one of
-the two blueprint catalogs that contain it, because Fleet won't adopt a Blueprint that
-another catalog created.
+The `can-i-openshell` blueprint lives in its own catalog in
+[SUSE-Technical-Marketing/can-i](https://github.com/SUSE-Technical-Marketing/can-i). It
+installs `agent-sandbox` and `openshell-gateway` from this repo's `wiredquill-openshell`
+ClusterRepo and only `can-i` from its own.
 
 ## Publishing
 
