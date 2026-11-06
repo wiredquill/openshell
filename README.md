@@ -20,7 +20,7 @@ images/
   hermes-rancher/       the Hermes image plus Rancher's agent CLI
 catalog/
   blueprints/           SUSE AI Factory blueprints and their BlueprintCatalog
-  clusterrepos/         the Rancher ClusterRepos the blueprints read charts from
+  clusterrepos/         the Rancher ClusterRepo for this repo's charts
 scripts/
   publish-charts.sh     package charts/* onto the aif/charts branch
   vendor-openshell-chart.sh   re-vendor NVIDIA's chart with nvidia-chart.patch
@@ -39,8 +39,8 @@ components can't install.
 | `wiredquill-ai-demos` | `wiredquill/ai-demos`, branch `aif/charts` | `hermes-openshell-vllm` (SUSE `vllm` with an install form) |
 
 In Rancher, open the **local** cluster, click **Import YAML** (the up-arrow icon in the
-top bar) and paste this, or run `kubectl apply -f catalog/clusterrepos/` against the local
-cluster:
+top bar) and paste this. `catalog/clusterrepos/` holds only `wiredquill-openshell`, the one
+this repo owns; the other two are defined in can-i and ai-demos:
 
 ```yaml
 apiVersion: catalog.cattle.io/v1
