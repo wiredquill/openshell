@@ -1,4 +1,14 @@
 questions:
+- variable: openshellGateway.enabled
+  label: Install the OpenShell gateway in this namespace
+  group: OpenShell gateway
+  type: boolean
+  default: false
+  description: >-
+    Also install the OpenShell gateway (OpenShell 2 - Gateway) here, in the same namespace as Hermes.
+    Leave off if this namespace already has a gateway, or to use one installed separately.
+    Agent Sandbox (OpenShell 1) must already be installed in the cluster.
+
 - variable: profile
   label: Security profile
   group: Security profile
@@ -382,12 +392,14 @@ questions:
   group: OpenShell gateway
   type: string
   default: https://openshell:8080
+  show_if: "openshellGateway.enabled=false"
   description: The openshell-gateway app's Service. Install this app in the same namespace.
 - variable: gateway.tlsSecret
   label: Gateway client certificate Secret
   group: OpenShell gateway
   type: string
   default: openshell-client-tls
+  show_if: "openshellGateway.enabled=false"
   description: Created by the openshell-gateway app in its namespace.
 
 - variable: service.type

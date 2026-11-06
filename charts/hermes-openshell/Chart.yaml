@@ -18,6 +18,16 @@ home: https://github.com/wiredquill/openshell
 sources:
 - https://github.com/NousResearch/hermes-agent
 - https://github.com/NVIDIA/OpenShell
+dependencies:
+  # Optional: install the OpenShell gateway in this release's namespace too
+  # (openshellGateway.enabled). Vendored as charts/openshell-gateway-*.tgz
+  # because scripts/publish-charts.sh runs plain `helm package`; after bumping
+  # charts/openshell-gateway, run `helm dependency build charts/hermes-openshell`.
+  - name: openshell-gateway
+    alias: openshellGateway
+    version: 0.1.9
+    repository: file://../openshell-gateway
+    condition: openshellGateway.enabled
 annotations:
   catalog.cattle.io/display-name: OpenShell 3 - Hermes Agent sandbox
   catalog.cattle.io/release-name: hermes

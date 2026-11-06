@@ -19,10 +19,13 @@ spec:
     form: an OpenAI-compatible API such as OpenRouter (the gateway holds the key,
     so it never enters the sandbox) or a vLLM service in the cluster.
 
-    Install into the namespace of OpenShell 2 - Gateway.
+    Install into the namespace of OpenShell 2 - Gateway, or tick "Install the
+    OpenShell gateway in this namespace" (first page of the form) to install the
+    gateway together with Hermes. Agent Sandbox (OpenShell 1) is needed either way.
 
-    2.1.0 adds an optional HTTPS Ingress for the browser terminal (Browser
-    terminal > HTTPS Ingress), using the cluster's wildcard certificate.
+    2.1.0 adds that gateway option and an optional HTTPS Ingress for the browser
+    terminal (Browser terminal > HTTPS Ingress) using the cluster's wildcard
+    certificate.
     2.0.0 installs only this app, like the Rancher app. 1.x bundled Agent Sandbox
     and the gateway.
   components:

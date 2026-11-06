@@ -137,6 +137,16 @@ gateway:
   endpoint: https://openshell:8080
   tlsSecret: openshell-client-tls
 
+# Install the OpenShell gateway (the openshell-gateway chart) in this release's
+# namespace as well, instead of installing "OpenShell 2 - Gateway" first. Leave
+# off if the namespace already has a gateway. Its Service and client Secret are
+# still named openshell / openshell-client-tls (fullnameOverride in that chart),
+# so the gateway.* defaults above match. Needs Agent Sandbox (OpenShell 1) in
+# the cluster, like the standalone gateway. Any openshell-gateway value can be
+# set under openshellGateway.*, e.g. openshellGateway.openshell.service.type.
+openshellGateway:
+  enabled: false
+
 client:
   image:
     repository: ghcr.io/wiredquill/hermes-openshell-client

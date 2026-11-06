@@ -1,0 +1,6 @@
+dependencies:
+- name: openshell-gateway
+  repository: file://../openshell-gateway
+  version: 0.1.9
+digest: sha256:402c66114217f1263f7d378ddf928b77629e21e3b4ccd548c889723cc0de52f3
+generated: "2026-11-06T11:23:03.158602-08:00"
