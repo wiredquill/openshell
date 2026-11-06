@@ -34,12 +34,10 @@ components can't install.
 
 | ClusterRepo name | Source | Used by |
 |---|---|---|
-| `wiredquill-openshell` | this repo, branch `aif/charts` | every blueprint |
-| `wiredquill-ai-demos` | `wiredquill/ai-demos`, branch `aif/charts` | `hermes-openshell-vllm` (SUSE `vllm` with an install form) |
+| `wiredquill-openshell` | this repo, branch `aif/charts` | every blueprint (and can-i's) |
 
 In Rancher, open the **local** cluster, click **Import YAML** (the up-arrow icon in the
-top bar) and paste this. `catalog/clusterrepos/` holds only `wiredquill-openshell`, the one
-this repo owns; the other is defined in ai-demos:
+top bar) and paste this (also `catalog/clusterrepos/wiredquill-openshell.yaml`):
 
 ```yaml
 apiVersion: catalog.cattle.io/v1
@@ -49,17 +47,9 @@ metadata:
 spec:
   gitRepo: https://github.com/wiredquill/openshell
   gitBranch: aif/charts
----
-apiVersion: catalog.cattle.io/v1
-kind: ClusterRepo
-metadata:
-  name: wiredquill-ai-demos
-spec:
-  gitRepo: https://github.com/wiredquill/ai-demos
-  gitBranch: aif/charts
 ```
 
-If you added this repo earlier as `openshell`, delete that one after the new ones show
+If you added this repo earlier as `openshell`, delete that one after the new one shows
 **Active**, so the charts aren't listed twice in Apps.
 
 ## Install order
@@ -84,13 +74,21 @@ Only step 3 creates a sandbox and a web UI. The architecture diagram is in
 
 ## Blueprints
 
-| Blueprint | Components |
-|---|---|
-| `hermes-openshell` 1.2.0 | `agent-sandbox`, `openshell-gateway`, `hermes-openshell`. The model is an external OpenAI-compatible API (OpenRouter by default). |
-| `hermes-openshell-vllm` 1.2.0 | Same, plus SUSE `vllm` 0.1.10 serving Qwen2.5-7B-Instruct (GPU) |
-| `hermes-rancher` 1.2.0 | `agent-sandbox`, `openshell-gateway`, `hermes-rancher` |
+One blueprint per Rancher app, with the same chart, version and defaults. Install them in
+the numbered order, like the Rancher apps:
 
-The blueprints need the two ClusterRepos in
+| Blueprint | Chart | Namespace |
+|---|---|---|
+| **OpenShell 1 - Agent Sandbox controller** (`openshell-agent-sandbox` 1.0.0) | `agent-sandbox` 1.0.11 | always `agent-sandbox-system`; once per cluster |
+| **OpenShell 2 - Gateway** (`openshell-gateway` 1.0.0) | `openshell-gateway` 0.1.9 | the namespace you pick, e.g. `openshell` |
+| **OpenShell 3 - Hermes Agent sandbox** (`hermes-openshell` 2.0.0) | `hermes-openshell` 0.2.1 | the gateway's namespace |
+| **Hermes for Rancher** (`hermes-rancher` 2.0.0) | `hermes-rancher` 0.2.2 | the gateway's namespace |
+
+`hermes-openshell` and `hermes-rancher` 1.x bundled Agent Sandbox and the gateway, and
+`hermes-openshell-vllm` added SUSE vLLM; they're gone. For an in-cluster model, install
+vLLM separately and pick the vLLM backend in the Hermes form.
+
+The blueprints need the `wiredquill-openshell` ClusterRepo in
 [Add the chart repositories to Rancher](#add-the-chart-repositories-to-rancher).
 
 The `can-i-openshell` blueprint lives in its own catalog in

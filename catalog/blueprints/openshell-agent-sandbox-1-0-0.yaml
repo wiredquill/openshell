@@ -1,0 +1,33 @@
+# One blueprint per Rancher app in the wiredquill-openshell repository, the same
+# chart and version, with the chart's own defaults: install them in the numbered
+# order, like the Rancher apps.
+apiVersion: ai-factory.suse.com/v1alpha1
+kind: Blueprint
+metadata:
+  labels:
+    ai-factory.suse.com/blueprint-name: openshell-agent-sandbox
+    ai-factory.suse.com/blueprint-version: 1.0.0
+  name: openshell-agent-sandbox-1-0-0
+spec:
+  source: Custom  # community, unsupported demo
+  displayName: OpenShell 1 - Agent Sandbox controller
+  version: 1.0.0
+  description: |
+    Kubernetes Agent Sandbox CRD and controller (agents.x-k8s.io), the cluster
+    prerequisite for OpenShell's Kubernetes driver. Packages the upstream v1.0.8
+    sandbox.yaml release manifest.
+
+    Install first, once per cluster. It always goes into the agent-sandbox-system
+    namespace, whatever namespace you pick.
+
+    Then install OpenShell 2 - Gateway and an OpenShell 3 app.
+
+    Prerequisite: Landlock enabled on every node that runs sandboxes
+    (docs/landlock in wiredquill/openshell). Skip this blueprint if Agent Sandbox
+    was already installed with kubectl apply: Helm can't adopt those resources.
+  components:
+  - chartName: agent-sandbox
+    chartRepo: wiredquill-openshell
+    chartVersion: 1.0.11
+    releaseName: agent-sandbox
+    targetNamespace: agent-sandbox-system
