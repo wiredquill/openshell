@@ -34,11 +34,11 @@ spec:
     # gateway's openshell-client-tls Secret and calls https://openshell:8080.
     - chartName: agent-sandbox
       chartRepo: wiredquill-openshell
-      chartVersion: "1.0.8"
+      chartVersion: "1.0.10"
       releaseName: agent-sandbox
     - chartName: openshell-gateway
       chartRepo: wiredquill-openshell
-      chartVersion: "0.1.6"
+      chartVersion: "0.1.8"
       releaseName: openshell
       values:
         openshell:
@@ -108,7 +108,7 @@ spec:
             endpoint: ""
     - chartName: hermes-openshell
       chartRepo: wiredquill-openshell
-      chartVersion: "0.1.0"
+      chartVersion: "0.1.3"
       releaseName: hermes
       values:
         profile: research
