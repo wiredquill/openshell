@@ -6,6 +6,8 @@ metadata:
     ai-factory.suse.com/blueprint-version: 1.1.0
   name: hermes-openshell-1-1-0
 spec:
+  # Superseded by 1.2.0 (agent-sandbox 1.0.11, openshell-gateway 0.1.9). Kept for rollback.
+  deprecated: true
   source: Custom  # community, unsupported demo
   displayName: Hermes Agent in OpenShell
   version: 1.1.0

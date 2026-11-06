@@ -86,9 +86,9 @@ Only step 3 creates a sandbox and a web UI. The architecture diagram is in
 
 | Blueprint | Components |
 |---|---|
-| `hermes-openshell` 1.0.0 | `agent-sandbox`, `openshell-gateway`, `hermes-openshell`. The model is an external OpenAI-compatible API (OpenRouter by default). |
-| `hermes-openshell-vllm` 1.0.0 | Same, plus SUSE `vllm` 0.1.10 serving Qwen2.5-7B-Instruct (GPU) |
-| `hermes-rancher` 1.0.0 | `agent-sandbox`, `openshell-gateway`, `hermes-rancher` |
+| `hermes-openshell` 1.2.0 | `agent-sandbox`, `openshell-gateway`, `hermes-openshell`. The model is an external OpenAI-compatible API (OpenRouter by default). |
+| `hermes-openshell-vllm` 1.2.0 | Same, plus SUSE `vllm` 0.1.10 serving Qwen2.5-7B-Instruct (GPU) |
+| `hermes-rancher` 1.2.0 | `agent-sandbox`, `openshell-gateway`, `hermes-rancher` |
 
 The blueprints need the two ClusterRepos in
 [Add the chart repositories to Rancher](#add-the-chart-repositories-to-rancher).
