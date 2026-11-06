@@ -25,18 +25,51 @@ scripts/
   publish-charts.sh     package charts/* onto the aif/charts branch
   vendor-openshell-chart.sh   re-vendor NVIDIA's chart with nvidia-chart.patch
 ```
-## Add Repo to Rancher by importing ClusterRepo info 
+## Add the chart repositories to Rancher
 
-```
+The blueprints find their charts through ClusterRepos **with exactly these names**
+(`chartRepo:` in each blueprint). Under any other name, for example `openshell`, the
+AI Factory blueprint editor shows raw YAML instead of the install forms and the
+components can't install.
+
+| ClusterRepo name | Source | Used by |
+|---|---|---|
+| `wiredquill-openshell` | this repo, branch `aif/charts` | every blueprint |
+| `wiredquill-can-i` | `wiredquill/can-i`, branch `aif/charts` | `can-i-openshell` |
+| `wiredquill-ai-demos` | `wiredquill/ai-demos`, branch `aif/charts` | `hermes-openshell-vllm` (SUSE `vllm` with an install form) |
+
+In Rancher, open the **local** cluster, click **Import YAML** (the up-arrow icon in the
+top bar) and paste this, or run `kubectl apply -f catalog/clusterrepos/` against the local
+cluster:
+
+```yaml
 apiVersion: catalog.cattle.io/v1
 kind: ClusterRepo
 metadata:
-  name: openshell
+  name: wiredquill-openshell
 spec:
   gitRepo: https://github.com/wiredquill/openshell
   gitBranch: aif/charts
+---
+apiVersion: catalog.cattle.io/v1
+kind: ClusterRepo
+metadata:
+  name: wiredquill-can-i
+spec:
+  gitRepo: https://github.com/wiredquill/can-i
+  gitBranch: aif/charts
+---
+apiVersion: catalog.cattle.io/v1
+kind: ClusterRepo
+metadata:
+  name: wiredquill-ai-demos
+spec:
+  gitRepo: https://github.com/wiredquill/ai-demos
+  gitBranch: aif/charts
 ```
 
+If you added this repo earlier as `openshell`, delete that one after the new ones show
+**Active**, so the charts aren't listed twice in Apps.
 
 ## Install order
 
@@ -67,14 +100,8 @@ Only step 3 creates a sandbox and a web UI. The architecture diagram is in
 | `hermes-rancher` 1.0.0 | `agent-sandbox`, `openshell-gateway`, `hermes-rancher` |
 | `can-i-openshell` 1.0.0 | `agent-sandbox`, `openshell-gateway`, and `can-i` |
 
-The blueprints read charts from three ClusterRepos, all in `catalog/clusterrepos/`:
-`wiredquill-openshell` (this repo), `wiredquill-can-i` (the can-i chart) and
-`wiredquill-ai-demos` (the SUSE `vllm` chart with an install form). Register them once per
-Rancher management cluster:
-
-```bash
-kubectl apply -f catalog/clusterrepos/
-```
+The blueprints need the three ClusterRepos in
+[Add the chart repositories to Rancher](#add-the-chart-repositories-to-rancher).
 
 The `can-i-openshell` blueprint also exists in the can-i repository. Register only one of
 the two blueprint catalogs that contain it, because Fleet won't adopt a Blueprint that
