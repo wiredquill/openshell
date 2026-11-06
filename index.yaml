@@ -7,7 +7,35 @@ entries:
       catalog.cattle.io/release-name: agent-sandbox
     apiVersion: v2
     appVersion: v1.0.8
-    created: "2026-10-30T14:52:58.630110138Z"
+    created: "2026-11-06T03:50:58.615611996Z"
+    description: Kubernetes Agent Sandbox CRD and controller (agents.x-k8s.io), the
+      cluster prerequisite for OpenShell's Kubernetes driver. Install first, once
+      per cluster. Packages the upstream v1.0.8 sandbox.yaml release manifest.
+    digest: 7c11fc2237eaa33343f00808776bedf397fdc4df8c39626eb591fb2338089cb6
+    home: https://github.com/wiredquill/openshell
+    keywords:
+    - openshell
+    - agent-sandbox
+    - sandbox
+    - ai-agents
+    - suse-ai-factory
+    maintainers:
+    - name: WiredQuill
+      url: https://github.com/wiredquill
+    name: agent-sandbox
+    sources:
+    - https://github.com/kubernetes-sigs/agent-sandbox
+    type: application
+    urls:
+    - agent-sandbox-1.0.11.tgz
+    version: 1.0.11
+  - annotations:
+      catalog.cattle.io/display-name: OpenShell 1 - Agent Sandbox controller
+      catalog.cattle.io/namespace: agent-sandbox-system
+      catalog.cattle.io/release-name: agent-sandbox
+    apiVersion: v2
+    appVersion: v1.0.8
+    created: "2026-11-06T03:50:58.614875149Z"
     description: Kubernetes Agent Sandbox CRD and controller (agents.x-k8s.io), the
       cluster prerequisite for OpenShell's Kubernetes driver. Install first, once
       per cluster. Packages the upstream v1.0.8 sandbox.yaml release manifest.
@@ -27,7 +55,7 @@ entries:
     - https://github.com/kubernetes-sigs/agent-sandbox
     type: application
     urls:
-    - https://github.com/wiredquill/openshell/agent-sandbox-1.0.10.tgz
+    - agent-sandbox-1.0.10.tgz
     version: 1.0.10
   hermes-openshell:
   - annotations:
@@ -35,7 +63,7 @@ entries:
       catalog.cattle.io/release-name: hermes
     apiVersion: v2
     appVersion: 0.19.0
-    created: "2026-10-30T14:52:58.63320879Z"
+    created: "2026-11-06T03:50:58.618144036Z"
     description: Hermes Agent (Nous Research) in an NVIDIA OpenShell sandbox on a
       SUSE OS, with a choice of four security profiles and a browser terminal. Install
       next to the OpenShell gateway app; also a component of the hermes-openshell
@@ -58,14 +86,14 @@ entries:
     - https://github.com/NVIDIA/OpenShell
     type: application
     urls:
-    - https://github.com/wiredquill/openshell/hermes-openshell-0.2.1.tgz
+    - hermes-openshell-0.2.1.tgz
     version: 0.2.1
   - annotations:
       catalog.cattle.io/display-name: OpenShell 3 - Hermes Agent sandbox
       catalog.cattle.io/release-name: hermes
     apiVersion: v2
     appVersion: 0.19.0
-    created: "2026-10-30T14:52:58.632171157Z"
+    created: "2026-11-06T03:50:58.617298086Z"
     description: Hermes Agent (Nous Research) in an NVIDIA OpenShell sandbox on a
       SUSE OS, with a choice of four security profiles and a browser terminal. Install
       next to the OpenShell gateway app; also a component of the hermes-openshell
@@ -88,14 +116,14 @@ entries:
     - https://github.com/NVIDIA/OpenShell
     type: application
     urls:
-    - https://github.com/wiredquill/openshell/hermes-openshell-0.2.0.tgz
+    - hermes-openshell-0.2.0.tgz
     version: 0.2.0
   - annotations:
       catalog.cattle.io/display-name: OpenShell 3 - Hermes Agent sandbox
       catalog.cattle.io/release-name: hermes
     apiVersion: v2
     appVersion: 0.19.0
-    created: "2026-10-30T14:52:58.631180993Z"
+    created: "2026-11-06T03:50:58.616412498Z"
     description: Hermes Agent (Nous Research) in an NVIDIA OpenShell sandbox on a
       SUSE OS, with a choice of four security profiles and a browser terminal. Install
       next to the OpenShell gateway app; also a component of the hermes-openshell
@@ -118,7 +146,7 @@ entries:
     - https://github.com/NVIDIA/OpenShell
     type: application
     urls:
-    - https://github.com/wiredquill/openshell/hermes-openshell-0.1.3.tgz
+    - hermes-openshell-0.1.3.tgz
     version: 0.1.3
   hermes-rancher:
   - annotations:
@@ -126,7 +154,7 @@ entries:
       catalog.cattle.io/release-name: hermes-rancher
     apiVersion: v2
     appVersion: 0.19.0
-    created: "2026-10-30T14:52:58.638609931Z"
+    created: "2026-11-06T03:50:58.623455754Z"
     description: 'Hermes for Rancher: Hermes Agent (Nous Research) for platform engineers,
       in an NVIDIA OpenShell sandbox on a SUSE OS, with kubectl on the cluster under
       a ServiceAccount of its own (view or operator). Install next to the OpenShell
@@ -152,14 +180,14 @@ entries:
     - https://github.com/NVIDIA/OpenShell
     type: application
     urls:
-    - https://github.com/wiredquill/openshell/hermes-rancher-0.2.2.tgz
+    - hermes-rancher-0.2.2.tgz
     version: 0.2.2
   - annotations:
       catalog.cattle.io/display-name: Hermes for Rancher
       catalog.cattle.io/release-name: hermes-rancher
     apiVersion: v2
     appVersion: 0.19.0
-    created: "2026-10-30T14:52:58.636618502Z"
+    created: "2026-11-06T03:50:58.622300855Z"
     description: 'Hermes for Rancher: Hermes Agent (Nous Research) for platform engineers,
       in an NVIDIA OpenShell sandbox on a SUSE OS, with kubectl on the cluster under
       a ServiceAccount of its own (view or operator). Install next to the OpenShell
@@ -185,14 +213,14 @@ entries:
     - https://github.com/NVIDIA/OpenShell
     type: application
     urls:
-    - https://github.com/wiredquill/openshell/hermes-rancher-0.2.1.tgz
+    - hermes-rancher-0.2.1.tgz
     version: 0.2.1
   - annotations:
       catalog.cattle.io/display-name: Hermes for Rancher
       catalog.cattle.io/release-name: hermes-rancher
     apiVersion: v2
     appVersion: 0.19.0
-    created: "2026-10-30T14:52:58.635412215Z"
+    created: "2026-11-06T03:50:58.620162341Z"
     description: 'Hermes for Rancher: Hermes Agent (Nous Research) for platform engineers,
       in an NVIDIA OpenShell sandbox on a SUSE OS, with kubectl on the cluster under
       a ServiceAccount of its own (view or operator). Install next to the OpenShell
@@ -218,14 +246,14 @@ entries:
     - https://github.com/NVIDIA/OpenShell
     type: application
     urls:
-    - https://github.com/wiredquill/openshell/hermes-rancher-0.2.0.tgz
+    - hermes-rancher-0.2.0.tgz
     version: 0.2.0
   - annotations:
       catalog.cattle.io/display-name: Hermes for Rancher
       catalog.cattle.io/release-name: hermes-rancher
     apiVersion: v2
     appVersion: 0.19.0
-    created: "2026-10-30T14:52:58.634300564Z"
+    created: "2026-11-06T03:50:58.619117285Z"
     description: 'Hermes for Rancher: Hermes Agent (Nous Research) for platform engineers,
       in an NVIDIA OpenShell sandbox on a SUSE OS, with kubectl on the cluster under
       a ServiceAccount of its own (view or operator). Install next to the OpenShell
@@ -251,7 +279,7 @@ entries:
     - https://github.com/NVIDIA/OpenShell
     type: application
     urls:
-    - https://github.com/wiredquill/openshell/hermes-rancher-0.1.0.tgz
+    - hermes-rancher-0.1.0.tgz
     version: 0.1.0
   openshell-gateway:
   - annotations:
@@ -259,7 +287,40 @@ entries:
       catalog.cattle.io/release-name: openshell
     apiVersion: v2
     appVersion: 0.1.5
-    created: "2026-10-30T14:52:58.642554729Z"
+    created: "2026-11-06T03:50:58.630359858Z"
+    dependencies:
+    - alias: openshell
+      name: helm-chart
+      repository: ""
+      version: 0.1.5
+    description: NVIDIA OpenShell gateway (control plane for agent sandboxes; creates
+      no sandbox itself) with lab defaults and a Rancher install form. Vendors the
+      official NVIDIA chart oci://ghcr.io/nvidia/openshell/helm-chart 0.1.5 in charts/helm-chart,
+      with nvidia-chart.patch applied.
+    digest: 7727c59aff1da13004e076c215f9a61b4ae95dc49658be3616ee6aefdb69b82e
+    home: https://github.com/wiredquill/openshell
+    keywords:
+    - openshell
+    - nvidia
+    - sandbox
+    - ai-agents
+    - suse-ai-factory
+    maintainers:
+    - name: WiredQuill
+      url: https://github.com/wiredquill
+    name: openshell-gateway
+    sources:
+    - https://github.com/NVIDIA/OpenShell
+    type: application
+    urls:
+    - openshell-gateway-0.1.9.tgz
+    version: 0.1.9
+  - annotations:
+      catalog.cattle.io/display-name: OpenShell 2 - Gateway
+      catalog.cattle.io/release-name: openshell
+    apiVersion: v2
+    appVersion: 0.1.5
+    created: "2026-11-06T03:50:58.626317024Z"
     dependencies:
     - alias: openshell
       name: helm-chart
@@ -285,6 +346,6 @@ entries:
     - https://github.com/NVIDIA/OpenShell
     type: application
     urls:
-    - https://github.com/wiredquill/openshell/openshell-gateway-0.1.8.tgz
+    - openshell-gateway-0.1.8.tgz
     version: 0.1.8
-generated: "2026-10-30T14:52:58.629127508Z"
+generated: "2026-11-06T03:50:58.613925345Z"
