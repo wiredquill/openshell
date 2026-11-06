@@ -1,7 +1,9 @@
 name: Build and Push Hermes OpenShell Images
 
 # The sandbox image (SUSE BCI and openSUSE Leap bases) and the client image the
-# hermes-openshell chart deploys, then hermes-rancher (the BCI sandbox image of
+# hermes-openshell chart deploys, the openSUSE Leap lab image that is the
+# openshell-gateway chart's default sandbox (openshell-lab/leap, also tagged
+# 16.0 on main), then hermes-rancher (the BCI sandbox image of
 # the same commit plus Rancher's agent CLI) for the hermes-rancher chart. Every
 # push is tagged with its commit sha, so a branch can be deployed for testing;
 # only main also moves `latest`.
@@ -11,6 +13,7 @@ on:
       - 'images/hermes/**'
       - 'images/hermes-client/**'
       - 'images/hermes-rancher/**'
+      - 'labs/docker/images/leap/**'
       - '.github/workflows/build-hermes-openshell.yml'
   workflow_dispatch:
 
@@ -24,15 +27,26 @@ jobs:
       fail-fast: false
       matrix:
         include:
+          # hermes Dockerfiles copy their scripts from images/, so build from the root
           - image: hermes-openshell
+            context: .
             file: images/hermes/Dockerfile
             build-args: ""
           - image: hermes-openshell-opensuse
+            context: .
             file: images/hermes/Dockerfile
             build-args: BASE=registry.opensuse.org/opensuse/leap:16.0
           - image: hermes-openshell-client
+            context: .
             file: images/hermes-client/Dockerfile
             build-args: ""
+          # openshell-gateway's default sandbox image (charts/openshell-gateway
+          # values: openshell-lab/leap:16.0); COPYs probes/ from its own dir
+          - image: openshell-lab/leap
+            context: labs/docker/images/leap
+            file: labs/docker/images/leap/Dockerfile
+            build-args: ""
+            version-tag: "16.0"
 
     steps:
       - name: Checkout repository
@@ -59,12 +73,12 @@ jobs:
           tags: |
             type=sha,prefix=
             type=raw,value=latest,enable={{is_default_branch}}
+            type=raw,value=${{ matrix.version-tag }},enable=${{ matrix.version-tag != '' && github.ref == 'refs/heads/main' }}
 
       - name: Build and push ${{ matrix.image }}
         uses: docker/build-push-action@v5
         with:
-          # both Dockerfiles copy their scripts from images/, so build from the root
-          context: .
+          context: ${{ matrix.context }}
           file: ${{ matrix.file }}
           build-args: ${{ matrix.build-args }}
           platforms: linux/amd64,linux/arm64
