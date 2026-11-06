@@ -44,6 +44,9 @@ RuntimeClass of their own.
   is missing.
 - A CNI that enforces `NetworkPolicy`. RKE2's Canal, Calico and Cilium all do.
 - A default StorageClass, or set one in the form, for the gateway database.
+- **Landlock enabled on every node that runs sandboxes.** Without it no sandbox starts.
+  See [Enable Landlock](../../docs/landlock/README.md) for SLES and openSUSE, and how to
+  check each node.
 
 ## Check it
 

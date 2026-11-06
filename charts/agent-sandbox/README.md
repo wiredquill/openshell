@@ -11,6 +11,9 @@ The `Sandbox` custom resource (`agents.x-k8s.io`) and its controller, from
 The OpenShell gateway's Kubernetes driver creates one `Sandbox` per agent sandbox, and this
 controller turns each `Sandbox` into a pod.
 
+**Every node that runs sandboxes needs Landlock enabled first.** See
+[Enable Landlock](../../docs/landlock/README.md).
+
 ## The OpenShell apps
 
 Install them in this order. Every app after the first goes into the **same namespace**

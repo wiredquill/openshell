@@ -2,10 +2,10 @@ apiVersion: v2
 name: agent-sandbox
 description: Kubernetes Agent Sandbox CRD and controller (agents.x-k8s.io), the cluster prerequisite for OpenShell's Kubernetes driver. Install first, once per cluster. Packages the upstream v1.0.8 sandbox.yaml release manifest.
 type: application
-version: 1.0.10
+version: 1.0.11
 appVersion: v1.0.8
 keywords: [openshell, agent-sandbox, sandbox, ai-agents, suse-ai-factory]
-home: https://github.com/wiredquill/can-i
+home: https://github.com/wiredquill/openshell
 sources:
   - https://github.com/kubernetes-sigs/agent-sandbox
 maintainers:

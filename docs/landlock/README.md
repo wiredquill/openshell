@@ -144,7 +144,7 @@ The debug pods go into the current namespace. Each log line should include `land
 
 ### From inside an OpenShell sandbox
 
-[can-i](https://github.com/wiredquill/can-i) reports the Landlock ABI version the kernel offers. Connect to a running can-i
+[can-i](https://github.com/SUSE-Technical-Marketing/can-i) reports the Landlock ABI version the kernel offers. Connect to a running can-i
 sandbox and look at the system panel:
 
 ```bash
