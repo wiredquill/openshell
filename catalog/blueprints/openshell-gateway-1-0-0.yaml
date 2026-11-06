@@ -1,0 +1,30 @@
+# One blueprint per Rancher app in the wiredquill-openshell repository, the same
+# chart and version, with the chart's own defaults: install them in the numbered
+# order, like the Rancher apps.
+apiVersion: ai-factory.suse.com/v1alpha1
+kind: Blueprint
+metadata:
+  labels:
+    ai-factory.suse.com/blueprint-name: openshell-gateway
+    ai-factory.suse.com/blueprint-version: 1.0.0
+  name: openshell-gateway-1-0-0
+spec:
+  source: Custom  # community, unsupported demo
+  displayName: OpenShell 2 - Gateway
+  version: 1.0.0
+  description: |
+    NVIDIA OpenShell 0.1.5 gateway: the control plane for agent sandboxes, with lab
+    defaults and an install form. It creates no sandbox itself.
+
+    Install after OpenShell 1 - Agent Sandbox controller (the install fails if its
+    CRDs are missing), one per namespace. Then install an OpenShell 3 app (Hermes
+    Agent sandbox, Hermes for Rancher or can-i) into the same namespace: it reads
+    this gateway's openshell-client-tls Secret and calls https://openshell:8080.
+
+    Prerequisites: a CNI that enforces NetworkPolicy (RKE2's Canal/Calico/Cilium
+    do) and a default StorageClass for the gateway database.
+  components:
+  - chartName: openshell-gateway
+    chartRepo: wiredquill-openshell
+    chartVersion: 0.1.9
+    releaseName: openshell
