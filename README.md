@@ -52,6 +52,15 @@ spec:
 If you added this repo earlier as `openshell`, delete that one after the new one shows
 **Active**, so the charts aren't listed twice in Apps.
 
+**Why a branch and not `main` or OCI.** Chart sources live on `main`, and CI packages
+them onto `aif/charts` (see [Publishing](#publishing)). Rancher's git catalog indexes only
+a root `index.yaml` with packaged `.tgz` files, which `main` doesn't have. The branch is
+append-only, so versions that blueprints pin never disappear. An OCI ClusterRepo on
+ghcr.io can't replace it: Rancher discovers the charts under an OCI namespace through the
+registry's `/v2/_catalog` API, which ghcr.io doesn't offer, so it would need one
+ClusterRepo per chart. OCI is only worth it for a chart over Fleet's 1 MiB limit for
+git-backed charts, as ai-demos does for `vllm-stack`.
+
 ## Install order
 
 Every node that runs sandboxes needs Landlock enabled in its kernel, or no sandbox starts.
