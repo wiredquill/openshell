@@ -2,7 +2,7 @@
 
 Hermes Agent (Nous Research, `hermes-agent` 0.19.0 from PyPI) as an NVIDIA
 OpenShell 0.1.5 sandbox, with four security profiles. Component of the
-`hermes-openshell` and `hermes-openshell-vllm` blueprints
+`hermes-openshell` and `hermes-openshell-gateway` blueprints
 (`catalog/blueprints/hermes-openshell*.yaml`). Hand-written, not generated.
 
 ## How it runs
@@ -34,6 +34,14 @@ Service and client certificate keep the names `openshell` and
 the namespace already has a gateway. Agent Sandbox (OpenShell 1) must be in the
 cluster either way. Gateway settings go under `openshellGateway.*`, e.g.
 `openshellGateway.openshell.service.type`.
+
+In SUSE AI Factory, use the **OpenShell 2+3 - Hermes Agent sandbox with gateway**
+blueprint (`hermes-openshell-gateway`), which sets `openshellGateway.enabled=true`
+itself. The AI Factory wizard (aif-ui 2.4.0) drops changes made in the form
+view, so ticking the box in the `hermes-openshell` blueprint's form installs
+Hermes without a gateway, and the client pod waits forever for the
+`openshell-client-tls` Secret. If you must use the form, switch to the YAML tab
+after setting options and make any edit there before installing.
 
 ### HTTPS (Ingress)
 
