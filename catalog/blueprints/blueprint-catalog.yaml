@@ -8,7 +8,7 @@ metadata:
   name: openshell
 spec:
   displayName: WiredQuill OpenShell
-  description: NVIDIA OpenShell on Kubernetes with one blueprint per app (Agent Sandbox controller, Gateway, Hermes Agent sandbox, Hermes for Rancher).
+  description: NVIDIA OpenShell on Kubernetes with one blueprint per app (Agent Sandbox controller, Gateway, Hermes Agent sandbox, Hermes Agent sandbox with gateway, Hermes for Rancher).
   categories: [demo, llm, security]
   maintainer:
     name: WiredQuill
@@ -19,4 +19,5 @@ spec:
     - name: openshell-agent-sandbox
     - name: openshell-gateway
     - name: hermes-openshell
+    - name: hermes-openshell-gateway
     - name: hermes-rancher

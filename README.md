@@ -81,8 +81,14 @@ the numbered order, like the Rancher apps:
 |---|---|---|
 | **OpenShell 1 - Agent Sandbox controller** (`openshell-agent-sandbox` 1.0.0) | `agent-sandbox` 1.0.11 | always `agent-sandbox-system`; once per cluster |
 | **OpenShell 2 - Gateway** (`openshell-gateway` 1.0.0) | `openshell-gateway` 0.1.9 | the namespace you pick, e.g. `openshell` |
-| **OpenShell 3 - Hermes Agent sandbox** (`hermes-openshell` 2.0.0) | `hermes-openshell` 0.2.1 | the gateway's namespace |
+| **OpenShell 3 - Hermes Agent sandbox** (`hermes-openshell` 2.1.0) | `hermes-openshell` 0.2.2 | the gateway's namespace |
+| **OpenShell 2+3 - Hermes Agent sandbox with gateway** (`hermes-openshell-gateway` 1.0.0) | `hermes-openshell` 0.2.2 with `openshellGateway.enabled=true` | a namespace with no gateway; replaces steps 2 and 3 |
 | **Hermes for Rancher** (`hermes-rancher` 2.0.0) | `hermes-rancher` 0.2.2 | the gateway's namespace |
+
+**Install-form caveat (aif-ui 2.4.0):** the AI Factory wizard drops changes made in the
+form view of the Customize step. Set options in the form, then switch to the YAML tab and
+make any edit there; the Review step must list the component as customized, or the chart
+defaults are installed. That's why the gateway option has its own blueprint.
 
 `hermes-openshell` and `hermes-rancher` 1.x bundled Agent Sandbox and the gateway, and
 `hermes-openshell-vllm` added SUSE vLLM; they're gone. For an in-cluster model, install

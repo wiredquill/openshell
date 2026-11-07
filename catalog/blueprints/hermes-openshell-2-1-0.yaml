@@ -19,9 +19,15 @@ spec:
     form: an OpenAI-compatible API such as OpenRouter (the gateway holds the key,
     so it never enters the sandbox) or a vLLM service in the cluster.
 
-    Install into the namespace of OpenShell 2 - Gateway, or tick "Install the
-    OpenShell gateway in this namespace" (first page of the form) to install the
-    gateway together with Hermes. Agent Sandbox (OpenShell 1) is needed either way.
+    Install into the namespace of OpenShell 2 - Gateway. To install the gateway
+    together with Hermes, use the OpenShell 2+3 - Hermes Agent sandbox with gateway
+    blueprint. Agent Sandbox (OpenShell 1) is needed either way.
+
+    Install-form caveat (aif-ui 2.4.0): changes made in the form view of the
+    Customize step, including "Install the OpenShell gateway in this namespace",
+    are not sent. Set options in the form, then switch to the YAML tab and make any
+    edit there (a trailing space is enough); the Review step must list the
+    component as customized, otherwise the chart defaults are installed.
 
     2.1.0 adds that gateway option and an optional HTTPS Ingress for the browser
     terminal (Browser terminal > HTTPS Ingress) using the cluster's wildcard
