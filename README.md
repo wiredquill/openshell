@@ -52,6 +52,15 @@ spec:
 If you added this repo earlier as `openshell`, delete that one after the new one shows
 **Active**, so the charts aren't listed twice in Apps.
 
+**Why a branch and not `main` or OCI.** Chart sources live on `main`, and CI packages
+them onto `aif/charts` (see [Publishing](#publishing)). Rancher's git catalog indexes only
+a root `index.yaml` with packaged `.tgz` files, which `main` doesn't have. The branch is
+append-only, so versions that blueprints pin never disappear. An OCI ClusterRepo on
+ghcr.io can't replace it: Rancher discovers the charts under an OCI namespace through the
+registry's `/v2/_catalog` API, which ghcr.io doesn't offer, so it would need one
+ClusterRepo per chart. OCI is only worth it for a chart over Fleet's 1 MiB limit for
+git-backed charts, as ai-demos does for `vllm-stack`.
+
 ## Install order
 
 Every node that runs sandboxes needs Landlock enabled in its kernel, or no sandbox starts.
@@ -97,6 +106,92 @@ vLLM separately and pick the vLLM backend in the Hermes form.
 The blueprints need the `wiredquill-openshell` ClusterRepo in
 [Add the chart repositories to Rancher](#add-the-chart-repositories-to-rancher).
 
+### Register the blueprint catalog
+
+AI Factory lists only blueprints from a registered catalog. In **AI Factory → Settings →
+Blueprint Catalogs → Custom Catalogs → Add Catalog**:
+
+| Field | Value |
+|---|---|
+| Name | `openshell` (the `metadata.name` in [`blueprint-catalog.yaml`](catalog/blueprints/blueprint-catalog.yaml)) |
+| Repository URL | `https://github.com/wiredquill/openshell` |
+| Branch | `main` (`aif/charts` holds only packaged charts) |
+| Paths | `catalog/blueprints` (no leading `/`) |
+
+Or in the `aif-operator` Helm values:
+
+```yaml
+blueprintCatalogs:
+  - name: openshell
+    repoURL: https://github.com/wiredquill/openshell
+    branch: main
+    paths: [catalog/blueprints]
+```
+
+Fleet then applies every blueprint in `catalog/blueprints/` and keeps them in sync with
+`main`. The operator fetches charts from git ClusterRepos at deploy time, so AI Factory's
+**Settings → Rancher API Access** needs a Rancher URL and token as well.
+
+## Hermes for Rancher: authentication
+
+Hermes for Rancher reaches clusters one of two ways (`platform.via`, the form's **Cluster
+access** page):
+
+- **`kubernetes`** (default): kubectl on the cluster Hermes is installed on, as a
+  ServiceAccount the chart creates and binds to `view` or `operator`
+  (`platform.access`). Nothing to set up.
+- **`rancher`**: Rancher's CLI, and kubectl through Rancher, on every cluster a Rancher API
+  token can reach. You set this up as follows.
+
+1. **Create a user for Hermes.** In Rancher, **Users & Authentication → Users → Create**:
+   a local user (e.g. `hermes`) with global permission **Standard User**. Then on each
+   cluster Hermes should see, **Cluster and Project Members → Add**, give that user only
+   the roles it needs, e.g. **Read-only** on the projects. The user's roles are the limit
+   of what Hermes can do.
+2. **Create an API key as that user.** Log in as `hermes`, open **Account & API Keys →
+   Create API Key**, set **Scope: No scope** and an expiry, and copy the **Bearer Token**
+   (`token-xxxxx:yyyy…`).
+3. **Store the token in a Secret** in the namespace you'll install into, on the cluster
+   Hermes runs on. This keeps it out of the Helm release and the AIWorkload:
+
+   ```bash
+   kubectl create namespace hermes-rancher
+   kubectl -n hermes-rancher create secret generic rancher-cli \
+     --from-literal=token='token-xxxxx:yyyy...'
+   ```
+4. **Install with these values.** In Rancher Apps, set them on the **Cluster access** page.
+   In the AI Factory blueprint, put them in the YAML tab, because the wizard drops form
+   changes (see the caveat above), and check that Review shows the component as
+   customized:
+
+   ```yaml
+   platform:
+     access: view                    # or operator
+     via: rancher
+     rancher:
+       url: https://rancher.example.com
+       existingSecret: rancher-cli
+       existingSecretKey: token
+   ```
+
+   Rancher's certificate must be publicly trusted: the OpenShell gateway terminates that
+   TLS to add the token, so the sandbox only ever sees a placeholder. With `view`, the
+   gateway also lets only GET/HEAD/OPTIONS through to Rancher.
+5. **Check it.** `hermes-rancher` is the release name, `hermes-sandbox` the default
+   sandbox name:
+
+   ```bash
+   kubectl -n hermes-rancher logs deploy/hermes-rancher-client
+   kubectl -n hermes-rancher exec deploy/hermes-rancher-client -- \
+     openshell sandbox exec hermes-sandbox --no-tty -- kubectl config get-contexts
+   ```
+
+   You should see one context per cluster the `hermes` user can reach. To rotate the
+   token, update the Secret and restart `deploy/hermes-rancher-client`.
+
+Details, including what fences the token, are in
+[`charts/hermes-rancher/README.md`](charts/hermes-rancher/README.md#through-rancher-platformvia-rancher).
+
 The `can-i-openshell` blueprint lives in its own catalog in
 [SUSE-Technical-Marketing/can-i](https://github.com/SUSE-Technical-Marketing/can-i). It
 installs `agent-sandbox` and `openshell-gateway` from this repo's `wiredquill-openshell`
@@ -108,5 +203,7 @@ ClusterRepo and only `can-i` from its own.
   on every push to `main` that touches `charts/`. Published versions are immutable, so bump
   a chart's `version` to ship a change.
 - **Images:** `.github/workflows/build-hermes-openshell.yml` builds `hermes-openshell`,
-  `hermes-openshell-opensuse`, `hermes-openshell-client` and `hermes-rancher` to
-  `ghcr.io/wiredquill/`, tagged with the commit sha; `main` also moves `latest`.
+  `hermes-openshell-opensuse`, `hermes-openshell-client` and `openshell-lab/leap` (the
+  gateway's default sandbox image) for linux/amd64 and linux/arm64, and `hermes-rancher`
+  for linux/amd64 only, to `ghcr.io/wiredquill/`, tagged with the commit sha. `main` also
+  moves `latest`, and `openshell-lab/leap` also gets `16.0`.
