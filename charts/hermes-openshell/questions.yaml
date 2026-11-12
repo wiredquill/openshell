@@ -20,15 +20,75 @@ questions:
     - research
     - developer
     - dangerous
+    - custom
   description: >-
     What OpenShell lets the agent do. Every profile runs as a non-root user and can reach the model.
     lockdown: no other network access. Writes only to its home directory and /tmp. Hermes asks before every risky command.
     research: adds read-only web access (GET only) to Wikipedia, arXiv, GitHub, Python, SUSE, openSUSE and NVIDIA docs.
     developer: adds GitHub clone, push and pull requests (no deletes) and pip installs from PyPI.
     dangerous: any program may reach any subdomain of the common TLDs, plus popular bare domains, over HTTP or HTTPS.
+    custom: lockdown plus whatever you tick under Policy add-ons, add as extra hosts or write as extra rules.
     Landlock is best effort, and Hermes runs commands without asking. Demo use only.
     (OpenShell 0.1.5 can't allow every host: no raw IP addresses, cluster Services or unlisted bare domains.)
     Changing the profile recreates the sandbox.
+
+
+- variable: policy.addons.webRead
+  label: Read-only web (docs sites)
+  group: Policy add-ons
+  type: boolean
+  default: false
+  description: >-
+    Add-ons are added to the chosen profile's network rules, so any profile can be widened one piece at a time
+    (pick custom to start from lockdown). Reads (GET) to Wikipedia, arXiv, GitHub, Python, SUSE, openSUSE and NVIDIA docs.
+- variable: policy.addons.suseDocs
+  label: SUSE, Rancher and Kubernetes docs
+  group: Policy add-ons
+  type: boolean
+  default: false
+  description: Reads (GET) to SUSE, openSUSE, Rancher, RKE2 and Kubernetes documentation.
+- variable: policy.addons.githubRead
+  label: GitHub, read-only
+  group: Policy add-ons
+  type: boolean
+  default: false
+  description: Clone, fetch and browse on GitHub. No push.
+- variable: policy.addons.githubWrite
+  label: GitHub, push and pull requests
+  group: Policy add-ons
+  type: boolean
+  default: false
+  description: Push and open issues or pull requests (POST, PUT, PATCH). No DELETE.
+- variable: policy.addons.pypi
+  label: PyPI package installs
+  group: Policy add-ons
+  type: boolean
+  default: false
+  description: pip install from pypi.org.
+- variable: policy.addons.huggingface
+  label: Hugging Face downloads
+  group: Policy add-ons
+  type: boolean
+  default: false
+  description: Read-only model and dataset downloads from huggingface.co.
+- variable: policy.extraHosts
+  label: Extra hosts
+  group: Policy add-ons
+  type: multiline
+  default: ""
+  description: >-
+    One per line: host[:port] [read-only|read-write|full]. Port defaults to 443 and access to read-only
+    (GET, HEAD, OPTIONS). full is plain TCP/TLS with no method filtering. Reached by python and curl.
+    Lines starting with # are ignored. Example: api.example.com:8443 read-write
+- variable: policy.extraYaml
+  label: Extra network rules (YAML)
+  group: Policy add-ons
+  type: multiline
+  default: ""
+  description: >-
+    Full network_policies rules for anything the fields above can't say, as a map of rule name to rule
+    (endpoints and binaries). Added to the profile last. Changing any policy option recreates the sandbox.
+    Note: set these in the YAML tab if the form view's answers are not sent (aif-ui 2.4.0).
 
 - variable: model.backend
   label: Model backend
@@ -185,6 +245,13 @@ questions:
   default: "off"
   options: [manual, smart, "off"]
   show_if: "profile=dangerous"
+- variable: approvals.custom
+  label: Hermes approvals under custom
+  group: Hermes approvals
+  type: enum
+  default: smart
+  options: [manual, smart, "off"]
+  show_if: "profile=custom"
 
 - variable: hermes.skins.lockdown
   label: Skin under lockdown
@@ -250,6 +317,24 @@ questions:
   type: enum
   default: charizard
   show_if: "profile=dangerous"
+  options:
+    - suse-dark
+    - suse-light
+    - default
+    - ares
+    - mono
+    - slate
+    - daylight
+    - warm-lightmode
+    - poseidon
+    - sisyphus
+    - charizard
+- variable: hermes.skins.custom
+  label: Skin under custom
+  group: Hermes options
+  type: enum
+  default: slate
+  show_if: "profile=custom"
   options:
     - suse-dark
     - suse-light

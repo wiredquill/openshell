@@ -1,0 +1,85 @@
+# Network add-ons for the sandbox policy, switched on in the install form (Policy
+# add-ons) as policy.addons.<key>. Each one adds a rule, prefixed addon-, to the
+# profile's network_policies, so any profile can be widened one piece at a time
+# without editing a profile file. Requests go through OpenShell's L7 proxy:
+# access read-only is GET/HEAD/OPTIONS, read-write adds POST/PUT/PATCH (no
+# DELETE). Edit or add entries here, and a matching policy.addons.<key> value.
+webRead:
+  description: Read-only web (GET) to Wikipedia, arXiv, GitHub, Python, SUSE, openSUSE and NVIDIA docs
+  rule:
+    name: addon-web-read
+    endpoints:
+      - {host: "*.wikipedia.org", port: 443, protocol: rest, access: read-only, enforcement: enforce}
+      - {host: arxiv.org, port: 443, protocol: rest, access: read-only, enforcement: enforce}
+      - {host: export.arxiv.org, port: 443, protocol: rest, access: read-only, enforcement: enforce}
+      - {host: github.com, port: 443, protocol: rest, access: read-only, enforcement: enforce}
+      - {host: api.github.com, port: 443, protocol: rest, access: read-only, enforcement: enforce}
+      - {host: raw.githubusercontent.com, port: 443, protocol: rest, access: read-only, enforcement: enforce}
+      - {host: docs.python.org, port: 443, protocol: rest, access: read-only, enforcement: enforce}
+      - {host: "*.suse.com", port: 443, protocol: rest, access: read-only, enforcement: enforce}
+      - {host: "*.opensuse.org", port: 443, protocol: rest, access: read-only, enforcement: enforce}
+      - {host: docs.nvidia.com, port: 443, protocol: rest, access: read-only, enforcement: enforce}
+    binaries:
+      - path: /usr/bin/python3.13
+      - path: /usr/bin/curl
+suseDocs:
+  description: Read-only access to SUSE, openSUSE, Rancher, RKE2 and Kubernetes documentation
+  rule:
+    name: addon-suse-docs
+    endpoints:
+      - {host: "*.suse.com", port: 443, protocol: rest, access: read-only, enforcement: enforce}
+      - {host: "*.opensuse.org", port: 443, protocol: rest, access: read-only, enforcement: enforce}
+      - {host: ranchermanager.docs.rancher.com, port: 443, protocol: rest, access: read-only, enforcement: enforce}
+      - {host: docs.rke2.io, port: 443, protocol: rest, access: read-only, enforcement: enforce}
+      - {host: kubernetes.io, port: 443, protocol: rest, access: read-only, enforcement: enforce}
+    binaries:
+      - path: /usr/bin/python3.13
+      - path: /usr/bin/curl
+githubRead:
+  description: Read-only GitHub (clone, fetch, browse, raw files)
+  rule:
+    name: addon-github-read
+    endpoints:
+      - {host: github.com, port: 443, protocol: rest, access: read-only, enforcement: enforce}
+      - {host: api.github.com, port: 443, protocol: rest, access: read-only, enforcement: enforce}
+      - {host: raw.githubusercontent.com, port: 443, protocol: rest, access: read-only, enforcement: enforce}
+      - {host: codeload.github.com, port: 443, protocol: rest, access: read-only, enforcement: enforce}
+    binaries:
+      - path: /usr/bin/python3.13
+      - path: /usr/bin/curl
+      - path: /usr/bin/git
+      - path: /usr/libexec/git*/git-remote-http*
+githubWrite:
+  description: GitHub push and pull requests (read-write, no DELETE)
+  rule:
+    name: addon-github-write
+    endpoints:
+      - {host: github.com, port: 443, protocol: rest, access: read-write, enforcement: enforce}
+      - {host: api.github.com, port: 443, protocol: rest, access: read-write, enforcement: enforce}
+      - {host: raw.githubusercontent.com, port: 443, protocol: rest, access: read-only, enforcement: enforce}
+      - {host: codeload.github.com, port: 443, protocol: rest, access: read-only, enforcement: enforce}
+    binaries:
+      - path: /usr/bin/python3.13
+      - path: /usr/bin/curl
+      - path: /usr/bin/git
+      - path: /usr/libexec/git*/git-remote-http*
+pypi:
+  description: pip installs from PyPI
+  rule:
+    name: addon-pypi
+    endpoints:
+      - {host: pypi.org, port: 443, protocol: rest, access: read-only, enforcement: enforce}
+      - {host: files.pythonhosted.org, port: 443, protocol: rest, access: read-only, enforcement: enforce}
+    binaries:
+      - path: /usr/bin/python3.13
+huggingface:
+  description: Read-only Hugging Face (model and dataset downloads)
+  rule:
+    name: addon-huggingface
+    endpoints:
+      - {host: huggingface.co, port: 443, protocol: rest, access: read-only, enforcement: enforce}
+      - {host: "*.huggingface.co", port: 443, protocol: rest, access: read-only, enforcement: enforce}
+      - {host: "*.hf.co", port: 443, protocol: rest, access: read-only, enforcement: enforce}
+    binaries:
+      - path: /usr/bin/python3.13
+      - path: /usr/bin/curl

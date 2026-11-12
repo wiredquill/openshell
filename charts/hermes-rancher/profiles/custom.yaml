@@ -1,0 +1,25 @@
+# custom: lockdown, to be widened in the install form (Policy add-ons, extra
+# hosts, extra rules). With nothing selected it is the same as lockdown: Hermes
+# can think and edit files in its workspace, and the only way out is the model.
+version: 1
+filesystem_policy:
+  # /opt/hermes is the venv; /usr/local/bin holds hermes, ttyd and the entrypoint
+  read_only:
+    - /usr
+    - /opt/hermes
+    - /lib
+    - /lib64
+    - /etc
+  read_write:
+    - /home/hermes
+    - /tmp
+    # pseudo-terminals for ttyd's hermes sessions (not in OpenShell's baseline)
+    - /dev/ptmx
+    - /dev/pts
+    - /dev/tty
+landlock:
+  # refuse to start rather than run without the filesystem rules
+  compatibility: hard_requirement
+process:
+  run_as_user: "10001"
+  run_as_group: "10001"

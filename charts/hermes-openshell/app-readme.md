@@ -10,6 +10,10 @@ Pick a **security profile** and watch what the agent can and can't do under it.
 | **research** | read-only (GET) to Wikipedia, arXiv, GitHub, docs sites | home + /tmp | smart |
 | **developer** | + GitHub push/PRs (no deletes), PyPI | home, /tmp, /var/tmp | smart |
 | **dangerous** | any subdomain of the common TLDs plus popular bare domains, on 80/443, any program | Landlock best effort | off |
+| **custom** | none, until you tick Policy add-ons, list extra hosts or add rules | home + /tmp only | smart |
+
+Under any profile, **Policy add-ons** switch on web reads, SUSE docs, GitHub (read or push), PyPI and Hugging Face,
+and extra hosts or YAML rules can be added; the form changes the policy before it is applied.
 
 Even under **dangerous**, OpenShell keeps the agent off root, cloud metadata, loopback and the
 Kubernetes API, etcd and kubelet ports.
