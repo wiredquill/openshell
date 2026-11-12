@@ -38,6 +38,13 @@ model:
   # vllm = the SUSE vLLM router in this namespace (hermes-openshell-vllm
   # blueprint, or your own install). external = any OpenAI-compatible API.
   backend: vllm
+  # Limits handed to Hermes (model.context_length / model.max_tokens in its
+  # config). Hermes can't discover them from a vLLM router, so it defaults
+  # max_tokens to 65536 and vLLM rejects every call with HTTP 400 when the
+  # server's --max-model-len is smaller. Set contextLength to the server's
+  # --max-model-len and keep maxTokens well below it. 0 = leave to Hermes.
+  contextLength: 0
+  maxTokens: 0
   vllm:
     url: http://vllm-router-service/v1
     # Must match the vllm component's modelURL.
