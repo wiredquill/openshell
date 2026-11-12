@@ -9,6 +9,9 @@
 #   HERMES_KEY_ENV    name of the env var holding the API key ("" = no key). With an
 #                     OpenShell provider it holds a placeholder; the gateway's proxy
 #                     swaps in the real key for the model's host only.
+#   HERMES_CONTEXT_LENGTH, HERMES_MAX_TOKENS
+#                     the model server's context window and a max_tokens that fits it
+#                     (0 = leave to Hermes)
 #   HERMES_APPROVALS  manual | smart | off (the profile picks it)
 #   TTYD_PORT         default 7681
 #   HERMES_TITLE      the browser tab's title (the chart adds the profile)
@@ -33,6 +36,8 @@ set -euo pipefail
 : "${HERMES_BASE_URL:?HERMES_BASE_URL is required}"
 : "${HERMES_MODEL:?HERMES_MODEL is required}"
 : "${HERMES_KEY_ENV:=}"
+: "${HERMES_CONTEXT_LENGTH:=0}"
+: "${HERMES_MAX_TOKENS:=0}"
 : "${HERMES_APPROVALS:=smart}"
 : "${TTYD_PORT:=7681}"
 : "${HERMES_TITLE:=Hermes in OpenShell}"
@@ -59,6 +64,14 @@ if [ ! -s "$config" ]; then
     echo "  provider: custom"
     echo "  base_url: \"$HERMES_BASE_URL\""
     echo "  default: \"$HERMES_MODEL\""
+    # a vLLM router doesn't report its --max-model-len, and Hermes would ask for
+    # max_tokens=65536: set both so requests fit the server's window
+    if [ "$HERMES_CONTEXT_LENGTH" -gt 0 ] 2>/dev/null; then
+      echo "  context_length: $HERMES_CONTEXT_LENGTH"
+    fi
+    if [ "$HERMES_MAX_TOKENS" -gt 0 ] 2>/dev/null; then
+      echo "  max_tokens: $HERMES_MAX_TOKENS"
+    fi
     if [ -n "$HERMES_KEY_ENV" ]; then
       echo "  key_env: $HERMES_KEY_ENV"
     fi

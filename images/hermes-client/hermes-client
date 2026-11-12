@@ -31,6 +31,8 @@ set -euo pipefail
 : "${DELETE_ON_EXIT:=true}"
 : "${LLM_BASE_URL:?LLM_BASE_URL is required}"
 : "${LLM_MODEL:?LLM_MODEL is required}"
+: "${LLM_CONTEXT_LENGTH:=0}"
+: "${LLM_MAX_TOKENS:=0}"
 : "${LLM_API_KEY_FILE:=/etc/hermes/llm/api-key}"
 : "${PROVIDER_NAME:=$SANDBOX_NAME-llm}"
 : "${TARGET_PORT:=7681}"
@@ -143,6 +145,8 @@ else
         --no-auto-providers --provider "$PROVIDER_NAME" --no-tty --detach
         --env "HERMES_BASE_URL=$LLM_BASE_URL"
         --env "HERMES_MODEL=$LLM_MODEL"
+        --env "HERMES_CONTEXT_LENGTH=$LLM_CONTEXT_LENGTH"
+        --env "HERMES_MAX_TOKENS=$LLM_MAX_TOKENS"
         --env "HERMES_APPROVALS=$APPROVALS"
         --env "TTYD_PORT=$TARGET_PORT")
   [ -s "$LLM_API_KEY_FILE" ] && args+=(--env "HERMES_KEY_ENV=$KEY_ENV")

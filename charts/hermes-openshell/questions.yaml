@@ -57,6 +57,22 @@ questions:
   default: Qwen/Qwen2.5-7B-Instruct
   show_if: "model.backend=vllm"
   description: Must match the vllm component's model (modelURL). It needs tool calling, which vLLM enables with --enable-auto-tool-choice.
+- variable: model.contextLength
+  label: Model context length
+  group: Model
+  type: int
+  default: 0
+  description: >-
+    The server's context window in tokens (vLLM's --max-model-len, e.g. 32768). Hermes can't discover it from a
+    vLLM router. 0 = leave to Hermes.
+- variable: model.maxTokens
+  label: Max output tokens
+  group: Model
+  type: int
+  default: 0
+  description: >-
+    Cap on tokens per reply. Must be below the context length: Hermes defaults to 65536, which a vLLM server with
+    a smaller --max-model-len rejects with HTTP 400. 0 = leave to Hermes.
 - variable: model.external.url
   label: API base URL
   group: Model
