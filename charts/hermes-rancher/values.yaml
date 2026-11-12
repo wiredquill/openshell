@@ -4,8 +4,9 @@
 # chart's ServiceAccount, then forwards Hermes's browser terminal to a Service.
 # Install into the same namespace as openshell-gateway.
 
-# What the sandbox may do: lockdown | research | developer | dangerous.
-# Each is a policy file in profiles/ (see README.md for what each allows).
+# What the sandbox may do: lockdown | research | developer | dangerous | custom.
+# Each is a policy file in profiles/ (see README.md for what each allows); custom
+# is lockdown, to be widened with the policy block below.
 profile: research
 
 # Hermes's own command approvals for each profile (approvals.mode in its
@@ -16,6 +17,27 @@ approvals:
   research: smart
   developer: smart
   dangerous: "off"
+  custom: smart
+
+# Widen the profile above without editing it. Network add-ons (policy-addons.yaml),
+# extra hosts and extra rules are added to the profile's network_policies. Changing
+# any of them recreates the sandbox (sandbox.recreate). `scripts/preview-policy.sh`
+# prints the resulting policy before you deploy.
+policy:
+  addons:
+    webRead: false       # read-only web: Wikipedia, arXiv, GitHub, Python, SUSE, NVIDIA docs
+    suseDocs: false      # read-only SUSE, openSUSE, Rancher, RKE2, Kubernetes docs
+    githubRead: false    # read-only GitHub, clone and fetch
+    githubWrite: false   # GitHub push and pull requests (no DELETE)
+    pypi: false          # pip install from PyPI
+    huggingface: false   # read-only Hugging Face downloads
+  # One per line: host[:port] [read-only|read-write|full]. Port defaults to 443,
+  # access to read-only (GET/HEAD/OPTIONS via the L7 proxy); full is plain TCP/TLS,
+  # no method filtering. Reached by python and curl. "#" starts a comment.
+  extraHosts: ""
+  # Full network_policies rules, as YAML, for anything the above can't say
+  # (other binaries, other protocols). A map of rule name to rule.
+  extraYaml: ""
 
 sandbox:
   # Sandbox name in OpenShell (`openshell sandbox get <name>`). The sandbox pod,
@@ -41,6 +63,13 @@ model:
   # vllm = the SUSE vLLM router in this namespace (hermes-openshell-vllm
   # blueprint, or your own install). external = any OpenAI-compatible API.
   backend: vllm
+  # Limits handed to Hermes (model.context_length / model.max_tokens in its
+  # config). Hermes can't discover them from a vLLM router, so it defaults
+  # max_tokens to 65536 and vLLM rejects every call with HTTP 400 when the
+  # server's --max-model-len is smaller. Set contextLength to the server's
+  # --max-model-len and keep maxTokens well below it. 0 = leave to Hermes.
+  contextLength: 0
+  maxTokens: 0
   vllm:
     url: http://vllm-router-service/v1
     # Must match the vllm component's modelURL.
@@ -68,6 +97,7 @@ hermes:
     research: suse-dark
     developer: suse-dark
     dangerous: suse-dark
+    custom: suse-dark
   # Words that say which session this is, whatever the skin: the profile in
   # the prompt ("research ❯"), the response header and the browser tab title,
   # and a welcome line with what the profile allows, its approvals mode and
@@ -80,6 +110,7 @@ hermes:
       research: "Research session: read-only web (GET) to docs sites."
       developer: "Developer session: GitHub (clone, push, pull requests) and PyPI."
       dangerous: "DANGEROUS session: open internet, demo use only."
+      custom: "Custom session: lockdown plus the policy add-ons chosen at install."
   # Replace the skin's text; blank keeps the skin's own (or the session's).
   branding:
     enabled: true

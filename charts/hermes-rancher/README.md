@@ -163,8 +163,44 @@ for kubectl only.
 
 Filesystem, Landlock and process rules apply when the sandbox starts, so
 changing the profile in the form recreates the sandbox. Network rules can be
-swapped live from the client pod; all four profiles are mounted at
+swapped live from the client pod; all profiles are mounted at
 `/etc/hermes/profiles/` (see NOTES.txt).
+
+## Policy add-ons and extra rules
+
+The `profile` dropdown picks a base policy. **custom** is lockdown with nothing
+open, meant to be widened; the add-ons below also work on top of any other
+profile. Tick them in the install form (Policy add-ons) or set `policy.*`:
+
+| `policy.addons.` | Adds |
+|---|---|
+| `webRead` | read-only (GET) Wikipedia, arXiv, GitHub, docs.python.org, SUSE, openSUSE, NVIDIA docs |
+| `suseDocs` | read-only SUSE, openSUSE, Rancher, RKE2 and Kubernetes docs |
+| `githubRead` | read-only GitHub (clone, fetch, raw files) |
+| `githubWrite` | GitHub push and pull requests (POST/PUT/PATCH, no DELETE) |
+| `pypi` | `pip install` from PyPI |
+| `huggingface` | read-only model and dataset downloads |
+
+- `policy.extraHosts`: one `host[:port] [read-only|read-write|full]` per line
+  (port 443 and read-only by default; `full` is plain TCP/TLS without method
+  filtering). Reached by python and curl.
+- `policy.extraYaml`: full `network_policies` rules for anything else (a map of
+  rule name to rule), for other binaries or protocols.
+
+Each add-on is an `addon-<name>` rule in the profile's `network_policies`;
+`extra-hosts` and your own rule names are added the same way, and win over a
+profile rule of the same name. The add-ons live in `policy-addons.yaml`: add an
+entry there and a `policy.addons.<key>` value to offer another one. Any change
+recreates the sandbox. To see the result before deploying:
+
+```bash
+scripts/preview-policy.sh hermes-rancher --set profile=custom \
+  --set policy.addons.githubRead=true --set policy.addons.pypi=true \
+  --set-string policy.extraHosts=$'api.example.com:8443 read-write'
+```
+
+The profiles mounted at `/etc/hermes/profiles/` for live switching are the plain
+profile files, without add-ons.
 
 ## Hermes options
 

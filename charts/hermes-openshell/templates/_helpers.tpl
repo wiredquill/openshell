@@ -32,12 +32,70 @@ app.kubernetes.io/instance: {{ .Release.Name }}
 {{- end -}}
 
 {{/* The selected profile's policy file; fails on an unknown profile. */}}
+{{/* What the form adds to a profile's network_policies, as the profile's
+     policy: the Policy add-ons ticked (policy-addons.yaml), the hosts in
+     policy.extraHosts ("host[:port] [read-only|read-write|full]" per line) and
+     the rules in policy.extraYaml. Added rules win over a profile's rule of the
+     same name. Nothing added = the profile's text as is, comments included. */}}
+{{- define "hermes-openshell.policyExtras" -}}
+{{- $pol := .root.Values.policy | default dict -}}
+{{- $addons := .root.Files.Get "policy-addons.yaml" | fromYaml -}}
+{{- $rules := dict -}}
+{{- range $key, $on := ($pol.addons | default dict) -}}
+{{- if $on -}}
+{{- $def := get $addons $key -}}
+{{- if not $def -}}{{- fail (printf "unknown policy.addons.%s (see policy-addons.yaml)" $key) -}}{{- end -}}
+{{- $_ := set $rules $def.rule.name $def.rule -}}
+{{- end -}}
+{{- end -}}
+{{- $eps := list -}}
+{{- range $line := splitList "\n" ($pol.extraHosts | default "") -}}
+{{- $l := trim (regexReplaceAll "#.*$" $line "") -}}
+{{- if $l -}}
+{{- $f := splitList " " (regexReplaceAll "\\s+" $l " ") -}}
+{{- $hp := splitList ":" (index $f 0) -}}
+{{- $port := 443 -}}
+{{- if gt (len $hp) 1 }}{{ $port = atoi (last $hp) }}{{ end -}}
+{{- $access := "read-only" -}}
+{{- if gt (len $f) 1 }}{{ $access = index $f 1 }}{{ end -}}
+{{- $ep := dict "host" (index $hp 0) "port" $port -}}
+{{- if or (eq $access "read-only") (eq $access "read-write") -}}
+{{- $_ := set $ep "protocol" "rest" -}}
+{{- $_ = set $ep "access" $access -}}
+{{- $_ = set $ep "enforcement" "enforce" -}}
+{{- else if ne $access "full" -}}
+{{- fail (printf "policy.extraHosts: %q has access %q (read-only, read-write or full)" $l $access) -}}
+{{- end -}}
+{{- $eps = append $eps $ep -}}
+{{- end -}}
+{{- end -}}
+{{- if $eps -}}
+{{- $_ := set $rules "extra-hosts" (dict "name" "extra-hosts" "endpoints" $eps "binaries" (list (dict "path" "/usr/bin/python3.13") (dict "path" "/usr/bin/curl"))) -}}
+{{- end -}}
+{{- with $pol.extraYaml -}}
+{{- $y := fromYaml . -}}
+{{- if hasKey $y "Error" -}}{{- fail (printf "policy.extraYaml is not valid YAML: %s" (get $y "Error")) -}}{{- end -}}
+{{- if hasKey $y "network_policies" }}{{ $y = get $y "network_policies" }}{{ end -}}
+{{- range $k, $v := $y }}{{ $_ := set $rules $k $v }}{{ end -}}
+{{- end -}}
+{{- if not $rules -}}
+{{- .policy -}}
+{{- else -}}
+{{- $p := fromYaml .policy -}}
+{{- $np := $p.network_policies | default dict -}}
+{{- range $k, $v := $rules }}{{ $_ := set $np $k $v }}{{ end -}}
+{{- $_ := set $p "network_policies" $np -}}
+{{- toYaml $p -}}
+{{- end -}}
+{{- end -}}
+
 {{- define "hermes-openshell.policy" -}}
 {{- $f := printf "profiles/%s.yaml" .Values.profile -}}
 {{- $p := .Files.Get $f -}}
 {{- if not $p -}}
-{{- fail (printf "unknown profile %q (lockdown, research, developer or dangerous)" .Values.profile) -}}
+{{- fail (printf "unknown profile %q (lockdown, research, developer, dangerous or custom)" .Values.profile) -}}
 {{- end -}}
+{{- $p = include "hermes-openshell.policyExtras" (dict "root" . "policy" $p) -}}
 {{- include "hermes-openshell.withOtel" (dict "root" . "policy" $p) -}}
 {{- end -}}
 
